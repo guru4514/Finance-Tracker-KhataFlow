@@ -1,0 +1,15 @@
+{
+  "appId": "com.pigmie.record",
+  "appName": "Pigmie Record Management System",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "FirebaseAuthentication": {
+      "providers": [
+        "google.com"
+      ]
+    }
+  }
+}

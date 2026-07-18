@@ -1,0 +1,78 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper: Get the user's role in an org
+    function getMemberRole(orgId) {
+      return get(/databases/$(database)/documents/orgs/$(orgId)/members/$(request.auth.uid)).data.role;
+    }
+    
+    function isOrgMember(orgId) {
+      return exists(/databases/$(database)/documents/orgs/$(orgId)/members/$(request.auth.uid));
+    }
+    
+    function isPrivileged(orgId) {
+      let role = getMemberRole(orgId);
+      return role in ['owner', 'admin', 'manager'];
+    }
+    
+    // User profiles
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+    
+    // Organizations
+    match /orgs/{orgId} {
+      // Allow authenticated users to read the org doc (to verify it exists before joining)
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if getMemberRole(orgId) in ['owner', 'admin'];
+      
+      // Members
+      match /members/{memberId} {
+        // Allow members to read all members, and allow a user to read their own member doc (to check approval status)
+        allow read: if isOrgMember(orgId) || request.auth.uid == memberId;
+        allow create: if request.auth.uid == memberId; // Users can add themselves
+        allow update: if isPrivileged(orgId);
+        allow delete: if getMemberRole(orgId) in ['owner', 'admin'];
+      }
+      
+      // Customers
+      match /customers/{customerId} {
+        allow read: if isOrgMember(orgId);
+        allow create: if isOrgMember(orgId);
+        allow update: if isPrivileged(orgId) 
+                      || resource.data.assignedAgent == request.auth.uid;
+        allow delete: if getMemberRole(orgId) in ['owner', 'admin'];
+      }
+      
+      // Payments
+      match /payments/{paymentId} {
+        allow read: if isOrgMember(orgId);
+        allow create: if isOrgMember(orgId);
+        allow update: if isPrivileged(orgId);
+        allow delete: if getMemberRole(orgId) in ['owner', 'admin'];
+      }
+      
+      // Approvals
+      match /approvals/{approvalId} {
+        allow read: if isOrgMember(orgId);
+        allow create: if isOrgMember(orgId);
+        allow update: if isPrivileged(orgId);
+      }
+      
+      // Audit Log
+      match /auditLog/{logId} {
+        allow read: if isPrivileged(orgId);
+        allow create: if isOrgMember(orgId);
+      }
+      
+      // Invites
+      match /invites/{inviteId} {
+        allow read: if true; // Anyone with the code can read
+        allow create: if getMemberRole(orgId) in ['owner', 'admin'];
+        allow delete: if true; // Consumed on use
+      }
+    }
+  }
+}

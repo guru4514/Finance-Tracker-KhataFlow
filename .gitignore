@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Firebase credentials (contains API keys - DO NOT commit)
+firebase-config.js
+
+# Build output (generated from source files)
+www/
+
+# Android build (regenerate with: npx cap add android && npx cap sync)
+android/
+
+# IDE settings
+.idea/
+.vscode/
+
+# Logs
+server.log
+server.err.log
+
+# Test files
+test.js
+test-crash.js
+test-crash-2.js
+test-brace.js
+test-vm.js
+test.json
+
+# Misc
+Pigmie_Record_management_System

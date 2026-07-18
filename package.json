@@ -1,0 +1,30 @@
+{
+  "name": "pigmie-record-manager",
+  "version": "1.0.0",
+  "description": "Pigmie record management app packaged for Android.",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "web": "node scripts/serve.js",
+    "sync:web": "node scripts/sync-web.js",
+    "android:add": "npm run sync:web && cap add android",
+    "android:sync": "npm run sync:web && cap sync android",
+    "android:open": "npm run android:sync && cap open android",
+    "android:build": "npm run android:sync && cd android && gradlew.bat assembleDebug"
+  },
+  "main": "app.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor-firebase/authentication": "^8.3.0",
+    "@capacitor/android": "^8.4.1",
+    "@capacitor/app": "^8.1.0",
+    "@capacitor/cli": "^8.4.1",
+    "@capacitor/core": "^8.4.1",
+    "@capacitor/filesystem": "^8.1.2",
+    "@capacitor/share": "^8.0.1",
+    "@capgo/capacitor-native-biometric": "^8.5.0",
+    "jsdom": "^29.1.1"
+  }
+}
