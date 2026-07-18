@@ -225,11 +225,16 @@ function refreshApprovalsList() {
     }
 
     const db = window.firebase.firestore();
-    db.collection('orgs').doc(currentOrg.id).collection('approvals')
+    
+    // Clear any existing listener
+    if (window.approvalsListener) {
+        window.approvalsListener();
+    }
+
+    window.approvalsListener = db.collection('orgs').doc(currentOrg.id).collection('approvals')
       .where('status', '==', 'pending')
       .limit(20)
-      .get()
-      .then(snapshot => {
+      .onSnapshot(snapshot => {
           if (snapshot.empty) {
               container.innerHTML = `<p class="text-secondary" style="text-align:center; padding: 20px;">No pending approvals.</p>`;
               return;
@@ -238,7 +243,7 @@ function refreshApprovalsList() {
           let html = '';
           snapshot.forEach(doc => {
               const approval = doc.data();
-              const requestedBy = approval.requestedByName || _orgMembersCache?.find(m => m.uid === approval.requestedBy)?.displayName || approval.requestedBy;
+              const requestedBy = approval.requestedByName || window._orgMembersCache?.find(m => m.uid === approval.requestedBy)?.displayName || approval.requestedBy;
               const date = approval.timestamp ? new Date(approval.timestamp.toDate()).toLocaleString() : 'Just now';
               
               let summary = '';
@@ -270,8 +275,7 @@ function refreshApprovalsList() {
               `;
           });
           container.innerHTML = html;
-      })
-      .catch(err => {
+      }, err => {
           console.error("Failed to load approvals", err);
           container.innerHTML = `<p class="text-danger" style="text-align:center;">Failed to load approvals.</p>`;
       });

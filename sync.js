@@ -102,22 +102,21 @@ function initFirebase(config) {
 
             if (user) {
                 console.log("Firebase Auth: Logged in as", user.email);
-                
-                // Read chosen mode
+
                 let initialMode = localStorage.getItem('pigmie_initial_mode');
                 let initialRole = localStorage.getItem('pigmie_initial_role');
-                
-                if (!initialMode) {
-                    // No mode saved. Check cloud for existing org membership.
-                    try {
-                        const userDoc = await cloudDb.collection('users').doc(user.uid).get();
-                        if (userDoc.exists && userDoc.data().activeOrgId) {
+
+                // ALWAYS check cloud to restore session in case local storage was cleared
+                try {
+                    const userDoc = await cloudDb.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        if (userDoc.data().activeOrgId) {
                             initialMode = 'org';
                             const orgId = userDoc.data().activeOrgId;
                             localStorage.setItem('pigmie_active_org', orgId);
                             localStorage.setItem('pigmie_initial_mode', 'org');
-                            
-                            // Try to get role from members
+
+                            // Try to get actual role from members
                             const memberDoc = await cloudDb.collection('orgs').doc(orgId).collection('members').doc(user.uid).get();
                             if (memberDoc.exists) {
                                 initialRole = memberDoc.data().role;
@@ -125,28 +124,28 @@ function initFirebase(config) {
                             } else {
                                 initialRole = 'agent';
                             }
-                        } else {
-                            // No org found in the cloud either.
-                            // Sign the user out and show the onboarding screen
-                            // so they can properly choose their mode.
-                            console.log("No mode saved and no org found. Showing onboarding.");
-                            await auth.signOut();
-                            if (onboardingUI) onboardingUI.style.display = 'flex';
-                            return;
+                        } else if (userDoc.data().customers || userDoc.data().lastSynced) {
+                            // User has a backup in their personal cloud profile!
+                            initialMode = 'personal';
+                            localStorage.setItem('pigmie_initial_mode', 'personal');
                         }
-                    } catch (e) {
-                        console.error('Failed to fallback fetch user doc:', e);
-                        // Sign out and show onboarding on error too
-                        await auth.signOut();
-                        if (onboardingUI) onboardingUI.style.display = 'flex';
-                        return;
                     }
+                } catch (e) {
+                    console.error('Failed to fetch user cloud profile:', e);
                 }
 
-                // If org and not admin, check if they are already approved
+                if (!initialMode) {
+                    // No mode saved and no org found in cloud.
+                    // Show onboarding so they can select a mode. Do NOT sign out.
+                    console.log("No mode saved. Showing onboarding.");
+                    if (onboardingUI) onboardingUI.style.display = 'flex';
+                    return;
+                }
+
+                // If org, handle org routing with real-time approval listener
                 if (initialMode === 'org') {
                     const orgId = localStorage.getItem('pigmie_active_org');
-                    
+
                     if (initialRole === 'admin' || initialRole === 'owner') {
                         // Admins/Owners can create orgs. Check if they already have one.
                         if (!orgId) {
@@ -162,20 +161,35 @@ function initFirebase(config) {
                             // No org yet, show join UI
                             if (joinOrgUI) joinOrgUI.style.display = 'flex';
                         } else {
-                            // They have an org, check their approval status.
-                            checkUserApprovalStatus(user.uid, initialRole).then(status => {
-                                if (status === 'approved') {
-                                    selectAppMode(initialMode, orgId);
-                                } else if (status === 'pending') {
-                                    if (pendingUI) pendingUI.style.display = 'flex';
-                                } else {
-                                    // Needs to join
+                            // Start real-time listener for approval status
+                            if (window.userApprovalListener) {
+                                window.userApprovalListener();
+                            }
+                            window.userApprovalListener = cloudDb.collection('orgs').doc(orgId).collection('members').doc(user.uid)
+                                .onSnapshot(doc => {
+                                    if (doc.exists) {
+                                        const data = doc.data();
+                                        if (data.status === 'approved' || data.status === 'active' || !data.status) {
+                                            if (pendingUI) pendingUI.style.display = 'none';
+                                            selectAppMode(initialMode, orgId);
+                                            // Once approved, we can optionally unsubscribe, but keeping it is fine.
+                                        } else if (data.status === 'pending') {
+                                            if (pendingUI) pendingUI.style.display = 'flex';
+                                            if (joinOrgUI) joinOrgUI.style.display = 'none';
+                                            if (appUI) appUI.classList.remove('active');
+                                        } else {
+                                            // Rejected
+                                            if (pendingUI) pendingUI.style.display = 'none';
+                                            if (joinOrgUI) joinOrgUI.style.display = 'flex';
+                                        }
+                                    } else {
+                                        if (pendingUI) pendingUI.style.display = 'none';
+                                        if (joinOrgUI) joinOrgUI.style.display = 'flex';
+                                    }
+                                }, err => {
+                                    console.error("Approval listener error:", err);
                                     if (joinOrgUI) joinOrgUI.style.display = 'flex';
-                                }
-                            }).catch(e => {
-                                console.error(e);
-                                if (joinOrgUI) joinOrgUI.style.display = 'flex';
-                            });
+                                });
                         }
                     }
                 } else {
@@ -296,7 +310,7 @@ async function signUpWithEmail() {
  */
 async function logLoginEvent(user) {
     if (!cloudDb || !user) return;
-    
+
     try {
         const deviceInfo = {
             platform: isNativePlatform() ? 'Android App' : 'Web Browser',
@@ -311,7 +325,7 @@ async function logLoginEvent(user) {
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             device: deviceInfo
         });
-        
+
         console.log("Login event logged for", user.email);
     } catch (error) {
         // Non-critical — don't block the user

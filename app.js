@@ -4135,9 +4135,17 @@ function selectInitialMode(mode, role = null) {
         localStorage.removeItem('pigmie_initial_role');
     }
     
-    // Hide onboarding and show login
+    // Hide onboarding
     document.getElementById('onboardingUI').style.display = 'none';
-    document.getElementById('loginUI').classList.add('active');
+    
+    // If the user is already logged into Firebase (but was missing a mode),
+    // just reload the page to trigger the main app initialization flow.
+    if (window.currentUser || (window.firebase && firebase.auth().currentUser)) {
+        window.location.reload();
+    } else {
+        // Show login
+        document.getElementById('loginUI').classList.add('active');
+    }
 }
 
 function showInitialOrgRoleSelection() {
