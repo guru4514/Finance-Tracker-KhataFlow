@@ -2,7 +2,6 @@
 node_modules/
 
 # Firebase credentials (contains API keys - DO NOT commit)
-firebase-config.js
 
 # Build output (generated from source files)
 www/
