@@ -13,6 +13,15 @@ function detachOrgListeners() {
     if (orgCustomersUnsubscribe) { orgCustomersUnsubscribe(); orgCustomersUnsubscribe = null; }
     if (orgPaymentsUnsubscribe) { orgPaymentsUnsubscribe(); orgPaymentsUnsubscribe = null; }
     if (orgMembersUnsubscribe) { orgMembersUnsubscribe(); orgMembersUnsubscribe = null; }
+    if (typeof detachApprovalsListener === 'function') { detachApprovalsListener(); }
+}
+
+let _orgRefreshTimer = null;
+function debouncedRefresh() {
+    if (_orgRefreshTimer) clearTimeout(_orgRefreshTimer);
+    _orgRefreshTimer = setTimeout(() => {
+        if (typeof refreshCurrentView === 'function') refreshCurrentView();
+    }, 100);
 }
 
 function attachOrgListeners() {
@@ -20,6 +29,9 @@ function attachOrgListeners() {
     
     const orgId = currentOrg.id;
     detachOrgListeners(); // ensure no duplicates
+    
+    _customersCache = [];
+    _paymentsCache = [];
     
     const isRestricted = (currentOrgMemberRole === 'agent' || currentOrgMemberRole === 'collector');
     
@@ -33,7 +45,7 @@ function attachOrgListeners() {
             const customers = [];
             snapshot.forEach(doc => customers.push(doc.data()));
             _customersCache = customers; // Update global cache directly
-            if (typeof refreshCurrentView === 'function') refreshCurrentView();
+            debouncedRefresh();
         });
         
     // Listen to payments
@@ -46,7 +58,7 @@ function attachOrgListeners() {
             const payments = [];
             snapshot.forEach(doc => payments.push(doc.data()));
             _paymentsCache = payments; // Update global cache directly
-            if (typeof refreshCurrentView === 'function') refreshCurrentView();
+            debouncedRefresh();
         });
         
     // Listen to members
@@ -55,7 +67,7 @@ function attachOrgListeners() {
             const members = [];
             snapshot.forEach(doc => members.push(doc.data()));
             _orgMembersCache = members;
-            if (typeof refreshCurrentView === 'function') refreshCurrentView();
+            debouncedRefresh();
         });
 }
 
@@ -67,7 +79,7 @@ function updateOrgUI() {
     }
     
     // Disable Add/Edit buttons for Viewers
-    const actionButtons = document.querySelectorAll('.fab, .btn-primary, .btn-success, .btn-danger, [onclick^="viewCustomerDetail"]');
+    const actionButtons = document.querySelectorAll('.main-content .fab, .main-content .btn-primary, .main-content .btn-success, .main-content .btn-danger, [onclick^="viewCustomerDetail"]');
     if (typeof appMode !== 'undefined' && appMode === 'org' && currentOrgMemberRole === 'viewer') {
         actionButtons.forEach(btn => btn.style.display = 'none');
     } else {
@@ -381,30 +393,6 @@ async function selectAppMode(mode, targetOrgId = null) {
     }
 }
 
-function showOrgOnboarding() {
-    document.getElementById('modeSelectPage1').style.display = 'none';
-    document.getElementById('modeSelectPage2').style.display = 'flex';
-}
-
-function hideOrgOnboarding() {
-    document.getElementById('modeSelectPage2').style.display = 'none';
-    document.getElementById('modeSelectPage1').style.display = 'flex';
-}
-
-async function handleCreateOrg() {
-    const orgName = document.getElementById('newOrgName').value.trim();
-    if (!orgName) {
-        showToast('Please enter a business name', 'error');
-        return;
-    }
-    
-    const orgId = await createOrganization(orgName);
-    if (orgId) {
-        selectAppMode('org', orgId);
-        // Close modal handled in selectAppMode
-    }
-}
-
 // NEW ONBOARDING JOIN FLOW
 async function requestToJoinOrgWithId(orgId) {
     if (typeof cloudDb === 'undefined' || !currentUser) {
@@ -463,92 +451,27 @@ async function requestToJoinOrgWithId(orgId) {
     }
 }
 
-function checkUserApprovalStatus(uid, role) {
-    return new Promise(async (resolve, reject) => {
-        const orgId = localStorage.getItem('pigmie_active_org');
-        if (!orgId) {
-            resolve('not_joined');
-            return;
-        }
-        try {
-            const doc = await cloudDb.collection('orgs').doc(orgId).collection('members').doc(uid).get();
-            if (doc.exists) {
-                const data = doc.data();
-                if (data.status === 'approved' || data.status === 'active' || !data.status) {
-                    resolve('approved');
-                } else if (data.status === 'pending') {
-                    resolve('pending');
-                } else {
-                    resolve('rejected');
-                }
-            } else {
-                resolve('not_joined');
-            }
-        } catch (e) {
-            reject(e);
-        }
-    });
-}
-
-// OLD INVITE CODE FLOW (Kept for backwards compatibility)
-async function handleJoinOrg() {
-    const code = document.getElementById('joinOrgCode').value.trim().toUpperCase();
-    if (!code) {
-        showToast('Please enter an invite code', 'error');
-        return;
+async function checkUserApprovalStatus(uid, role) {
+    const orgId = localStorage.getItem('pigmie_active_org');
+    if (!orgId) {
+        return 'not_joined';
     }
-    
-    if (typeof cloudDb === 'undefined' || !currentUser) {
-        showToast('You must be signed in to join an organization', 'error');
-        return;
-    }
-    
-    showToast('Verifying code...', 'info');
-    
     try {
-        // Query collection group for the invite code
-        const snapshot = await cloudDb.collectionGroup('invites').where(firebase.firestore.FieldPath.documentId(), '==', code).get();
-        
-        if (snapshot.empty) {
-            showToast('Invalid or expired invite code', 'error');
-            return;
+        const doc = await cloudDb.collection('orgs').doc(orgId).collection('members').doc(uid).get();
+        if (doc.exists) {
+            const data = doc.data();
+            if (data.status === 'approved' || data.status === 'active' || !data.status) {
+                return 'approved';
+            } else if (data.status === 'pending') {
+                return 'pending';
+            } else {
+                return 'rejected';
+            }
+        } else {
+            return 'not_joined';
         }
-        
-        const inviteDoc = snapshot.docs[0];
-        const orgId = inviteDoc.ref.parent.parent.id; // orgs/{orgId}/invites/{code}
-        const role = inviteDoc.data().role || 'agent';
-        
-        // With invite code, they are pre-approved
-        await cloudDb.collection('orgs').doc(orgId).collection('members').doc(currentUser.uid).set({
-            uid: currentUser.uid,
-            email: currentUser.email,
-            displayName: currentUser.displayName || currentUser.email,
-            role: role,
-            status: 'approved',
-            joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        // Add organization to user's profiles
-        await cloudDb.collection('users').doc(currentUser.uid).set({
-            activeOrgId: orgId
-        }, { merge: true });
-        
-        // Delete the invite code after use
-        await inviteDoc.ref.delete();
-        
-        localStorage.setItem('pigmie_active_org', orgId);
-        showToast('Successfully joined organization!', 'success');
-        
-        // Fetch org details
-        const orgDoc = await cloudDb.collection('orgs').doc(orgId).get();
-        if (orgDoc.exists) {
-            currentOrg = { id: orgDoc.id, ...orgDoc.data() };
-        }
-        
-        selectAppMode('org');
-    } catch (err) {
-        console.error('Error joining organization:', err);
-        showToast('Error joining organization', 'error');
+    } catch (e) {
+        throw e;
     }
 }
 
@@ -575,9 +498,12 @@ async function showInviteCode() {
 
 // Unified Data Layer for Phase 1
 async function dbSaveCustomer(customer, skipApproval = false) {
-    if (!skipApproval && needsApproval('ADD_CUSTOMER')) {
+    const isEdit = getCustomers().some(c => c.id === customer.id);
+    const actionType = isEdit ? 'EDIT_CUSTOMER' : 'ADD_CUSTOMER';
+
+    if (!skipApproval && typeof needsApproval === 'function' && needsApproval(actionType)) {
         if (typeof submitForApproval === 'function') {
-            await submitForApproval('ADD_CUSTOMER', customer);
+            await submitForApproval(actionType, customer);
             return;
         }
     }
@@ -645,8 +571,8 @@ async function dbSavePayment(payment) {
 }
 
 async function dbDeletePayment(id, skipApproval = false) {
+    const payment = getPayments().find(p => p.id === id);
     if (!skipApproval && needsApproval('DELETE_PAYMENT')) {
-        const payment = getPayments().find(p => p.id === id);
         if (typeof submitForApproval === 'function' && payment) {
             await submitForApproval('DELETE_PAYMENT', payment);
             return;
@@ -663,7 +589,7 @@ async function dbDeletePayment(id, skipApproval = false) {
         _paymentsCache = payments;
         
         if (typeof logAudit === 'function') {
-            logAudit('PAYMENT_DELETED', id, { amount: 0 }); 
+            logAudit('PAYMENT_DELETED', id, { amount: payment ? payment.amount : 0 }); 
         }
     } catch (err) {
         console.error('Failed to delete payment from cloud:', err);

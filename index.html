@@ -59,6 +59,19 @@
                         <p>Create or join a team</p>
                     </div>
                 </button>
+                <button class="mode-card" onclick="showCustomerPortalLogin()">
+                    <div class="mode-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning-color);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                            <polyline points="22,6 12,13 2,6" />
+                        </svg>
+                    </div>
+                    <div class="mode-info">
+                        <h4>📱 Customer Portal</h4>
+                        <p>Track Balance (Only Org Mode)</p>
+                    </div>
+                </button>
             </div>
 
             <div id="onboardingPage2" style="display: none; flex-direction: column; gap: 16px;">
@@ -97,6 +110,78 @@
                         <p>Collect payments (Requires Approval)</p>
                     </div>
                 </button>
+                <button class="mode-card" onclick="selectInitialMode('org', 'viewer')">
+                    <div class="mode-info">
+                        <h4>Viewer</h4>
+                        <p>View records only (Requires Approval)</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Portal UI -->
+    <div id="customerPortalUI" style="display: none; position: fixed; inset: 0; background: var(--bg-color); z-index: 1000; overflow-y: auto;">
+        <div class="login-card" id="customerPortalLogin" style="max-width: 500px; padding: 40px; margin: 40px auto;">
+            <div class="logo-icon" style="margin: 0 auto 16px; background: rgba(245, 158, 11, 0.1); color: var(--warning-color);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                </svg>
+            </div>
+            <h2 style="margin-bottom: 16px; text-align: center;">Customer Tracking</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 24px; text-align: center;">Enter your Customer ID to view your digital passbook (Organization Mode only).</p>
+            
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label>Organization ID</label>
+                <input type="text" id="trackOrgId" placeholder="e.g. org_1712..." class="form-control">
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Ask your agent for their Organization ID</div>
+            </div>
+            
+            <div class="form-group">
+                <label>Customer ID</label>
+                <input type="text" id="trackCustomerId" placeholder="e.g. CUST-123456" class="form-control">
+            </div>
+            
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button class="btn btn-secondary" style="flex: 1" onclick="hideCustomerPortalLogin()">Back</button>
+                <button class="btn btn-primary" style="flex: 1" onclick="trackCustomerPassbook()">View Passbook</button>
+            </div>
+        </div>
+
+        <div id="customerPortalPassbook" style="display: none; max-width: 800px; margin: 40px auto; padding: 0 20px;">
+            <button class="btn btn-secondary" onclick="resetCustomerPortal()" style="margin-bottom: 24px;">
+                &larr; Back to Tracking
+            </button>
+            <div class="card" style="padding: 24px;">
+                <h2 id="passbookCustomerName" style="margin-bottom: 8px;">Customer Name</h2>
+                <p id="passbookAgentName" style="color: var(--text-secondary); margin-bottom: 24px;">Agent: Unknown</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px;">
+                    <div style="background: rgba(99, 102, 241, 0.1); padding: 16px; border-radius: 12px;">
+                        <div style="color: var(--primary-color); font-size: 14px; margin-bottom: 4px;">Total Loan</div>
+                        <div style="font-size: 24px; font-weight: 600;" id="passbookTotalLoan">₹0</div>
+                    </div>
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 16px; border-radius: 12px;">
+                        <div style="color: var(--success-color); font-size: 14px; margin-bottom: 4px;">Remaining Balance</div>
+                        <div style="font-size: 24px; font-weight: 600;" id="passbookRemaining">₹0</div>
+                    </div>
+                </div>
+
+                <h3>Recent Payments</h3>
+                <div class="table-container" style="margin-top: 16px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="passbookPaymentsList">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -329,6 +414,16 @@
                         <div class="stat-info">
                             <span class="stat-label" data-i18n="statTodayCollection">Today's Collection</span>
                             <span class="stat-value" id="statTodayCollection">₹0</span>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px; display: flex; gap: 8px;">
+                                <span style="display: flex; align-items: center; gap: 4px;">
+                                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: var(--primary-color);"></span>
+                                    <span data-i18n="statTodayLoans">Loans:</span> <strong id="statTodayLoans">₹0</strong>
+                                </span>
+                                <span style="display: flex; align-items: center; gap: 4px;">
+                                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: var(--success-color);"></span>
+                                    <span data-i18n="statTodaySavings">Savings:</span> <strong id="statTodaySavings">₹0</strong>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -356,8 +451,9 @@
 
                 <div class="dashboard-grid">
                     <div class="card recent-activity">
-                        <div class="card-header">
-                            <h3 data-i18n="recentPayments">Recent Payments</h3>
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3 data-i18n="recentPayments" style="margin: 0;">Recent Payments</h3>
+                            <a href="#" onclick="event.preventDefault(); viewAllTodayPayments();" style="font-size: 14px; color: var(--primary-color); text-decoration: none; font-weight: 500;" data-i18n="viewAll">View all</a>
                         </div>
                         <div class="card-body" id="recentPayments">
                             <div class="empty-state">
@@ -464,7 +560,13 @@
                         <button class="filter-btn" data-filter="closed" onclick="setCustomerFilter('closed')"
                             data-i18n="filterClosed">Closed</button>
                     </div>
-                    <div class="customer-sort-dropdown">
+                    <div class="customer-sort-dropdown" style="display: flex; gap: 8px;">
+                        <select id="customerTypeFilter" onchange="filterCustomers()"
+                            style="background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 12px; border-radius: var(--radius-md); font-size: 0.9rem; outline: none; font-family: inherit;">
+                            <option value="all" data-i18n="filterAllTypes">All Types</option>
+                            <option value="loan" data-i18n="filterLoansOnly">Loans Only</option>
+                            <option value="saving" data-i18n="filterSavingsOnly">Savings Only</option>
+                        </select>
                         <select id="customerSort" onchange="refreshCustomersView()"
                             style="background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 12px; border-radius: var(--radius-md); font-size: 0.9rem; outline: none; font-family: inherit;">
                             <option value="name-asc" data-i18n="sortNameAsc">Name (A-Z)</option>
@@ -513,9 +615,14 @@
 
                     <div class="daily-entry-controls">
                         <input type="date" id="entryDate" onchange="refreshDailyEntryView()">
-                        <select id="areaFilter" onchange="refreshDailyEntryView()">
+                        <select id="areaFilter" onchange="refreshDailyEntryView()" style="background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 12px; border-radius: var(--radius-md); font-size: 0.9rem; outline: none; font-family: inherit;">
                             <option value="all" data-i18n="allAreas">All Areas</option>
                             <!-- Populated dynamically -->
+                        </select>
+                        <select id="dailyTypeFilter" onchange="refreshDailyEntryView()" style="background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 12px; border-radius: var(--radius-md); font-size: 0.9rem; outline: none; font-family: inherit;">
+                            <option value="all" data-i18n="filterAllTypes">All Types</option>
+                            <option value="loan" data-i18n="filterLoansOnly">Loans Only</option>
+                            <option value="saving" data-i18n="filterSavingsOnly">Savings Only</option>
                         </select>
                     </div>
                 </div>
@@ -1196,6 +1303,7 @@
     <script src="org.js?v=20"></script>
     <script src="permissions.js?v=20"></script>
     <script src="audit.js?v=20"></script>
+    <script src="customer-portal.js?v=20"></script>
     <script src="app.js?v=20"></script>
 </body>
 

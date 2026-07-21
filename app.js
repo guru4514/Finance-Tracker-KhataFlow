@@ -957,6 +957,10 @@ function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
 }
 
+function generateCustomerId() {
+    return 'CUST-' + Math.floor(100000 + Math.random() * 900000).toString();
+}
+
 // === IndexedDB Backend & Memory Cache ===
 var db;
 let _customersCache = [];
@@ -1325,6 +1329,19 @@ function toggleSidebar() {
     // Legacy — no-op since sidebar is removed
 }
 
+function viewAllTodayPayments() {
+    const today = getTodayStr();
+    const dateInput = document.getElementById('recordFilterDate');
+    if (dateInput) {
+        dateInput.value = today;
+    }
+    const searchInput = document.getElementById('recordsSearch');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    switchView('records');
+}
+
 // === Dashboard ===
 function refreshDashboard() {
     if (appMode === 'org') {
@@ -1345,10 +1362,29 @@ function refreshDashboard() {
     const todayPayments = payments.filter(p => p.date === today);
     const todayCollection = todayPayments.reduce((sum, p) => sum + p.amount, 0);
 
+    let todayLoans = 0;
+    let todaySavings = 0;
+    todayPayments.forEach(p => {
+        const cust = customers.find(c => c.id === p.customerId);
+        if (cust && cust.customerType === 'saving') {
+            todaySavings += p.amount;
+        } else {
+            // Default to loan for historical records, deleted customers, or standard loans
+            todayLoans += p.amount;
+        }
+    });
+
     document.getElementById('statTotalCustomers').textContent = totalCustomers;
     document.getElementById('statTotalCollected').textContent = formatCurrency(totalCollected);
     document.getElementById('statPendingAmount').textContent = formatCurrency(Math.max(0, pendingAmount));
     document.getElementById('statTodayCollection').textContent = formatCurrency(todayCollection);
+    
+    if (document.getElementById('statTodayLoans')) {
+        document.getElementById('statTodayLoans').textContent = formatCurrency(todayLoans);
+    }
+    if (document.getElementById('statTodaySavings')) {
+        document.getElementById('statTodaySavings').textContent = formatCurrency(todaySavings);
+    }
 
     // Recent Payments
     const recentPaymentsEl = document.getElementById('recentPayments');
@@ -1508,6 +1544,15 @@ function refreshCustomersList() {
         filtered = filtered.filter(c => getCustomerStatus(c) === 'closed');
     }
 
+    // Apply type filter
+    const typeFilterEl = document.getElementById('customerTypeFilter');
+    if (typeFilterEl && typeFilterEl.value !== 'all') {
+        filtered = filtered.filter(c => {
+            const cType = c.customerType || 'loan'; // default historical records to loan
+            return cType === typeFilterEl.value;
+        });
+    }
+
     // Apply sorting
     filtered.sort((a, b) => {
         if (sortVal === 'name-asc') {
@@ -1521,8 +1566,10 @@ function refreshCustomersList() {
             const dB = b.deadline ? new Date(b.deadline).getTime() : Infinity;
             return dA - dB;
         } else {
-            // Newest (Default): assuming customer ID is timestamp or fallback to array index
-            // Since our generateId() starts with Date.now().toString(36), we can sort by id descending
+            // Newest (Default)
+            const dA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            if (dA !== dB) return dB - dA;
             return b.id.localeCompare(a.id);
         }
     });
@@ -1565,6 +1612,7 @@ function refreshCustomersList() {
                         <div>
                             <div class="customer-name">${index + 1}. ${c.name}</div>
                             <div class="customer-phone">${c.phone}</div>
+                            <div class="customer-phone" style="font-family: monospace; font-size: 11px; margin-bottom: 4px;">ID: ${c.id}</div>
                             <span class="customer-type-badge ${customerType}">${getCustomerTypeLabel(c)}</span>
                             <span class="status-badge ${status}">${t(isClosed ? 'statusClosed' : 'statusActive')}</span>
                         </div>
@@ -1756,7 +1804,7 @@ function closeCustomerModal() {
     document.getElementById('customerModal').classList.remove('active');
 }
 
-function saveCustomer(event) {
+async function saveCustomer(event) {
     event.preventDefault();
 
     const id = document.getElementById('customerId').value;
@@ -1782,7 +1830,7 @@ function saveCustomer(event) {
     } else {
         // Add new
         customerObj = {
-            id: generateId(),
+            id: generateCustomerId(),
             name,
             phone,
             area,
@@ -1823,7 +1871,7 @@ function saveCustomer(event) {
         if (!id) showToast(t('customerAdded'));
 
         if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbSaveCustomer === 'function') {
-            dbSaveCustomer(customerObj);
+            await dbSaveCustomer(customerObj);
         } else {
             const customers = getCustomers();
             const index = customers.findIndex(c => c.id === customerObj.id);
@@ -1857,10 +1905,10 @@ async function deleteCustomer(customerId) {
     }
 
     if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbDeleteCustomer === 'function') {
-        dbDeleteCustomer(customerId);
-        customerPayments.forEach(p => {
-            if (typeof dbDeletePayment === 'function') dbDeletePayment(p.id);
-        });
+        await dbDeleteCustomer(customerId);
+        for (const p of customerPayments) {
+            if (typeof dbDeletePayment === 'function') await dbDeletePayment(p.id);
+        }
     } else {
         customers = customers.filter(c => c.id !== customerId);
         saveCustomers(customers);
@@ -1925,6 +1973,10 @@ function viewCustomerDetail(customerId) {
             <div>
                 <div class="detail-name">${getDisplayName(customer)}</div>
                 <div class="detail-phone-text">${customer.phone} ${customer.area ? `· <span style="color: var(--text-muted)">${customer.area}</span>` : ''}</div>
+                <div style="font-family: monospace; margin: 4px 0 8px; font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+                    Org ID: <strong style="color: var(--text-primary);">${typeof currentOrg !== 'undefined' && currentOrg ? currentOrg.id : (localStorage.getItem('pigmie_active_org') || 'N/A')}</strong><br>
+                    Customer ID: <strong style="color: var(--text-primary);">${customer.id}</strong>
+                </div>
                 <span class="customer-type-badge ${customerType}">${getCustomerTypeLabel(customer)}</span>
                 <span class="status-badge ${status}">${t(isClosed ? 'statusClosed' : 'statusActive')}</span>
                 
@@ -2062,7 +2114,7 @@ async function deletePayment(paymentId, customerId) {
     const paymentToDelete = payments.find(p => p.id === paymentId);
 
     if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbDeletePayment === 'function') {
-        dbDeletePayment(paymentId);
+        await dbDeletePayment(paymentId);
     } else {
         payments = payments.filter(p => p.id !== paymentId);
         savePayments(payments);
@@ -2075,7 +2127,7 @@ async function deletePayment(paymentId, customerId) {
             if (!undoConfirmed) return;
 
             if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbSavePayment === 'function') {
-                dbSavePayment(paymentToDelete);
+                await dbSavePayment(paymentToDelete);
             } else {
                 let currentPayments = getPayments();
                 currentPayments.push(paymentToDelete);
@@ -2171,7 +2223,7 @@ async function closeLoan(customerId) {
         customers[index].status = 'closed';
         customers[index].closedDate = getTodayStr();
         if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbSaveCustomer === 'function') {
-            dbSaveCustomer(customers[index], true);
+            await dbSaveCustomer(customers[index], true);
         } else {
             saveCustomers(customers);
         }
@@ -2181,7 +2233,7 @@ async function closeLoan(customerId) {
     }
 }
 
-function renewLoan(customerId) {
+async function renewLoan(customerId) {
     if (!canPerform('RENEW_LOAN')) {
         showToast(typeof t === 'function' ? t('noPermission') || 'You do not have permission' : 'You do not have permission', 'error');
         return;
@@ -2191,21 +2243,23 @@ function renewLoan(customerId) {
     const index = customers.findIndex(c => c.id === customerId);
     if (index !== -1) {
         const customer = customers[index];
+        // Calculate duration BEFORE overwriting issuedDate
+        const originalStart = new Date(customer.issuedDate);
+        const originalEnd = new Date(customer.deadline);
+        const durationDays = Math.round((originalEnd - originalStart) / (1000 * 60 * 60 * 24));
+        
         // Reset to active with today's date
         customer.status = 'active';
         customer.issuedDate = getTodayStr();
         customer.closedDate = '';
+        
         // Set deadline to same duration from today
-        const originalStart = new Date(customer.issuedDate);
-        const originalEnd = new Date(customer.deadline);
-        const durationDays = Math.round((originalEnd - originalStart) / (1000 * 60 * 60 * 24));
         const newDeadline = new Date();
         newDeadline.setDate(newDeadline.getDate() + Math.max(durationDays, 30));
         customer.deadline = newDeadline.toISOString().split('T')[0];
-        customer.issuedDate = getTodayStr();
 
         if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbSaveCustomer === 'function') {
-            dbSaveCustomer(customer);
+            await dbSaveCustomer(customer);
         } else {
             saveCustomers(customers);
         }
@@ -2215,7 +2269,9 @@ function renewLoan(customerId) {
         const paymentsToDelete = payments.filter(p => p.customerId === customerId);
 
         if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbDeletePayment === 'function') {
-            paymentsToDelete.forEach(p => dbDeletePayment(p.id));
+            for (const p of paymentsToDelete) {
+                await dbDeletePayment(p.id);
+            }
         } else {
             payments = payments.filter(p => p.customerId !== customerId);
             savePayments(payments);
@@ -2251,12 +2307,16 @@ function refreshDailyEntryView() {
         areaSelect.value = currentArea;
     }
 
-    const filtered = customers.filter(c =>
-        getCustomerStatus(c) !== 'closed' &&
-        (areaFilterVal === 'all' || c.area === areaFilterVal) &&
-        (c.name.toLowerCase().includes(searchVal) ||
-            c.phone.includes(searchVal))
-    );
+    const typeFilterEl = document.getElementById('dailyTypeFilter');
+    const typeFilterVal = typeFilterEl ? typeFilterEl.value : 'all';
+
+    const filtered = customers.filter(c => {
+        const cType = c.customerType || 'loan';
+        return getCustomerStatus(c) !== 'closed' &&
+            (areaFilterVal === 'all' || c.area === areaFilterVal) &&
+            (typeFilterVal === 'all' || cType === typeFilterVal) &&
+            (c.name.toLowerCase().includes(searchVal) || c.phone.includes(searchVal));
+    });
 
     const container = document.getElementById('dailyEntryList');
 
@@ -2361,7 +2421,7 @@ function clearChipSelection(customerId) {
     }
 }
 
-function submitDailyEntry(customerId) {
+async function submitDailyEntry(customerId) {
     const date = document.getElementById('entryDate').value;
     if (!date) {
         showToast(t('selectDateFirst'), 'error');
@@ -2400,7 +2460,7 @@ function submitDailyEntry(customerId) {
     }
 
     if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbSavePayment === 'function') {
-        dbSavePayment(paymentObj);
+        await dbSavePayment(paymentObj);
     } else {
         payments.push(paymentObj);
         savePayments(payments);
@@ -2418,7 +2478,7 @@ function submitDailyEntry(customerId) {
             if (!undoConfirmed) return;
 
             if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbDeletePayment === 'function') {
-                dbDeletePayment(newPaymentId, true);
+                await dbDeletePayment(newPaymentId, true);
             } else {
                 let currentPayments = getPayments();
                 currentPayments = currentPayments.filter(p => p.id !== newPaymentId);
@@ -2430,6 +2490,34 @@ function submitDailyEntry(customerId) {
         }
     });
     refreshCurrentView();
+
+    // Check if loan is fully paid and prompt to close
+    if (customer && customer.status !== 'closed' && getCustomerType(customer) !== 'saving') {
+        const customerPayments = getPayments().filter(p => p.customerId === customerId);
+        const totalPaid = customerPayments.reduce((sum, p) => sum + p.amount, 0);
+        const totalRepayable = calculateTotalRepayable(customer);
+        
+        if (totalPaid >= totalRepayable) {
+            setTimeout(async () => {
+                const closeConfirmed = await showConfirm(`This payment fully clears the loan balance for ${getDisplayName(customer)}! Would you like to mark this loan as Closed?`);
+                if (closeConfirmed) {
+                    if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbSaveCustomer === 'function') {
+                        customer.status = 'closed';
+                        await dbSaveCustomer(customer);
+                    } else {
+                        const customers = getCustomers();
+                        const idx = customers.findIndex(c => c.id === customer.id);
+                        if (idx !== -1) {
+                            customers[idx].status = 'closed';
+                            saveCustomers(customers);
+                        }
+                    }
+                    showToast('Loan marked as closed!', 'success');
+                    refreshCurrentView();
+                }
+            }, 600); // Small delay to let the toast settle
+        }
+    }
 }
 
 // === Bulk Collection ===
@@ -2461,7 +2549,7 @@ function closeBulkCollectModal() {
     document.getElementById('bulkCollectModal').classList.remove('active');
 }
 
-function processBulkCollect() {
+async function processBulkCollect() {
     const amount = parseFloat(document.getElementById('bulkCollectAmount').value);
     const date = document.getElementById('entryDate').value;
 
@@ -2484,7 +2572,7 @@ function processBulkCollect() {
         return;
     }
 
-    selectedCheckboxes.forEach(cb => {
+    for (const cb of selectedCheckboxes) {
         const newId = generateId();
         newPaymentIds.push(newId);
 
@@ -2502,11 +2590,11 @@ function processBulkCollect() {
         }
 
         if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbSavePayment === 'function') {
-            dbSavePayment(paymentObj);
+            await dbSavePayment(paymentObj);
         } else {
             payments.push(paymentObj);
         }
-    });
+    }
 
     if (typeof appMode === 'undefined' || appMode !== 'org') {
         savePayments(payments);
@@ -2520,7 +2608,9 @@ function processBulkCollect() {
             if (!undoConfirmed) return;
 
             if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbDeletePayment === 'function') {
-                newPaymentIds.forEach(id => dbDeletePayment(id, true));
+                for (const id of newPaymentIds) {
+                    await dbDeletePayment(id, true);
+                }
             } else {
                 let currentPayments = getPayments();
                 currentPayments = currentPayments.filter(p => !newPaymentIds.includes(p.id));
@@ -2553,10 +2643,20 @@ function refreshRecordsList() {
     window.customerDateFilters = window.customerDateFilters || {};
     const customers = getCustomers();
     const searchVal = document.getElementById('recordsSearch').value.toLowerCase();
-    const filtered = customers.filter(c =>
+    const globalDateInput = document.getElementById('recordFilterDate');
+    const globalDateVal = globalDateInput ? globalDateInput.value : '';
+
+    let filtered = customers.filter(c =>
         c.name.toLowerCase().includes(searchVal) ||
         c.phone.includes(searchVal)
     );
+
+    if (globalDateVal) {
+        filtered = filtered.filter(c => {
+            const payments = getCustomerPayments(c.id);
+            return payments.some(p => p.date === globalDateVal);
+        });
+    }
 
     const container = document.getElementById('recordsList');
 
@@ -2637,7 +2737,9 @@ function refreshRecordsList() {
 
                     // Filter logic
                     const filter = window.customerDateFilters[c.id];
-                    if (filter) {
+                    if (globalDateVal) {
+                        chronological = chronological.filter(p => p.date === globalDateVal);
+                    } else if (filter) {
                         if (filter.start) chronological = chronological.filter(p => p.date >= filter.start);
                         if (filter.end) chronological = chronological.filter(p => p.date <= filter.end);
                     }

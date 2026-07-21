@@ -15,11 +15,11 @@ const PERMISSIONS = {
     
     // Payments
     ADD_PAYMENT:           ['owner', 'admin', 'manager', 'agent', 'collector'],
-    DELETE_PAYMENT:        ['owner', 'admin'],
+    DELETE_PAYMENT:        ['owner', 'admin', 'agent', 'collector'],
     EDIT_PAYMENT:          ['owner', 'admin'],
     
     // Loans
-    CLOSE_LOAN:            ['owner', 'admin', 'manager'],
+    CLOSE_LOAN:            ['owner', 'admin', 'manager', 'agent', 'collector'],
     RENEW_LOAN:            ['owner', 'admin', 'manager'],
     
     // Organization

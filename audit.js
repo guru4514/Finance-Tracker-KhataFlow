@@ -22,6 +22,15 @@ const APPROVAL_TYPES = {
  * @param {string} targetId - ID of the affected document (e.g., customerId, paymentId)
  * @param {Object} details - Additional context payload
  */
+let orgApprovalsUnsubscribe = null;
+
+function detachApprovalsListener() {
+    if (orgApprovalsUnsubscribe) {
+        orgApprovalsUnsubscribe();
+        orgApprovalsUnsubscribe = null;
+    }
+}
+
 async function logAudit(action, targetId, details = {}) {
     if (appMode !== 'org' || !currentOrg) return;
 
@@ -57,8 +66,9 @@ async function submitForApproval(type, payload) {
         
         // Enrich payload for better display in Admin Dashboard
         let enrichedPayload = { ...payload };
-        if ((type === 'DELETE_PAYMENT' || type === 'CLOSE_LOAN') && payload.customerId) {
-            const customer = getCustomers().find(c => c.id === payload.customerId);
+        const custId = payload.customerId || payload.id;
+        if ((type === 'DELETE_PAYMENT' || type === 'CLOSE_LOAN') && custId) {
+            const customer = getCustomers().find(c => c.id === custId);
             if (customer) {
                 enrichedPayload.customerName = getDisplayName(customer);
             }
@@ -97,7 +107,8 @@ async function executeApprovedAction(type, payload) {
         if (typeof dbDeletePayment === 'function') await dbDeletePayment(payload.id, true);
     } else if (type === APPROVAL_TYPES.CLOSE_LOAN) {
         if (typeof dbSaveCustomer === 'function') {
-            const customer = getCustomers().find(c => c.id === payload.customerId);
+            const custId = payload.customerId || payload.id;
+            const customer = getCustomers().find(c => c.id === custId);
             if (customer) {
                 customer.status = 'closed';
                 customer.closedDate = getTodayStr();
@@ -226,12 +237,12 @@ function refreshApprovalsList() {
 
     const db = window.firebase.firestore();
     
-    // Clear any existing listener
-    if (window.approvalsListener) {
-        window.approvalsListener();
+    // If listener is already active, don't recreate it
+    if (orgApprovalsUnsubscribe) {
+        return;
     }
 
-    window.approvalsListener = db.collection('orgs').doc(currentOrg.id).collection('approvals')
+    orgApprovalsUnsubscribe = db.collection('orgs').doc(currentOrg.id).collection('approvals')
       .where('status', '==', 'pending')
       .limit(20)
       .onSnapshot(snapshot => {

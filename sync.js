@@ -195,8 +195,7 @@ function initFirebase(config) {
                 } else {
                     // Personal mode
                     selectAppMode(initialMode);
-                    pushToCloud(false);
-                    pullFromCloud(true);
+                    await pullFromCloud(true); // Pull cloud data to local on login
                 }
             } else {
                 console.log("Firebase Auth: Logged out");
