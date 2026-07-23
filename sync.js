@@ -146,11 +146,10 @@ function initFirebase(config) {
                 }
 
                 if (!initialMode) {
-                    // No mode saved and no org found in cloud.
-                    // Show onboarding so they can select a mode. Do NOT sign out.
-                    console.log("No mode saved. Showing onboarding.");
-                    if (onboardingUI) onboardingUI.style.display = 'flex';
-                    return;
+                    // Default to personal mode if no mode saved so signed-in user enters the app directly
+                    console.log("No mode saved. Defaulting to personal mode.");
+                    initialMode = 'personal';
+                    localStorage.setItem('pigmie_initial_mode', 'personal');
                 }
 
                 // If org, handle org routing with real-time approval listener
@@ -183,7 +182,6 @@ function initFirebase(config) {
                                         if (data.status === 'approved' || data.status === 'active' || !data.status) {
                                             if (pendingUI) pendingUI.style.display = 'none';
                                             selectAppMode(initialMode, orgId);
-                                            // Once approved, we can optionally unsubscribe, but keeping it is fine.
                                         } else if (data.status === 'pending') {
                                             if (pendingUI) pendingUI.style.display = 'flex';
                                             if (joinOrgUI) joinOrgUI.style.display = 'none';
@@ -205,7 +203,7 @@ function initFirebase(config) {
                     }
                 } else {
                     // Personal mode
-                    selectAppMode(initialMode);
+                    await selectAppMode(initialMode);
                     await pullFromCloud(true); // Pull cloud data to local on login
                 }
             } else {
@@ -250,14 +248,31 @@ async function signInWithGoogle() {
 
     try {
         if (isNativePlatform()) {
-            const result = await Capacitor.Plugins.FirebaseAuthentication.signInWithGoogle();
-            const credential = firebase.auth.GoogleAuthProvider.credential(result.credential.idToken, result.credential.accessToken);
-            await auth.signInWithCredential(credential);
-            showToast("Successfully signed in!", "success");
+            let signedIn = false;
+            try {
+                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.FirebaseAuthentication) {
+                    const result = await window.Capacitor.Plugins.FirebaseAuthentication.signInWithGoogle();
+                    const idToken = result?.credential?.idToken || result?.idToken;
+                    const accessToken = result?.credential?.accessToken || result?.accessToken;
+                    if (idToken) {
+                        const credential = firebase.auth.GoogleAuthProvider.credential(idToken, accessToken);
+                        await auth.signInWithCredential(credential);
+                        signedIn = true;
+                    }
+                }
+            } catch (nativeErr) {
+                console.warn("Native Google sign-in failed, attempting web fallback:", nativeErr);
+            }
+
+            if (!signedIn) {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                await auth.signInWithPopup(provider);
+            }
         } else {
             const provider = new firebase.auth.GoogleAuthProvider();
             await auth.signInWithPopup(provider);
         }
+        showToast("Successfully signed in!", "success");
     } catch (error) {
         console.error("Sign-in error:", error);
         showToast("Sign-in failed: " + error.message, "error");

@@ -4238,15 +4238,18 @@ function selectInitialMode(mode, role = null) {
     }
     
     // Hide onboarding
-    document.getElementById('onboardingUI').style.display = 'none';
+    const onboardingUI = document.getElementById('onboardingUI');
+    if (onboardingUI) onboardingUI.style.display = 'none';
     
-    // If the user is already logged into Firebase (but was missing a mode),
-    // just reload the page to trigger the main app initialization flow.
+    // If the user is already logged into Firebase, directly enter app mode
     if (window.currentUser || (window.firebase && firebase.auth().currentUser)) {
-        window.location.reload();
+        if (typeof selectAppMode === 'function') {
+            selectAppMode(mode);
+        }
     } else {
         // Show login
-        document.getElementById('loginUI').classList.add('active');
+        const loginUI = document.getElementById('loginUI');
+        if (loginUI) loginUI.classList.add('active');
     }
 }
 
