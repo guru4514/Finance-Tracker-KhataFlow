@@ -1,12 +1,13 @@
-const CACHE_NAME = 'pigmie-cache-v19';
+const CACHE_NAME = 'pigmie-cache-v20';
 const ASSETS_TO_CACHE = [
-  './?v=19',
-  './index.html?v=19',
-  './styles.css?v=19',
-  './app.js?v=19',
-  './sync.js?v=19',
-  './org.js?v=19',
-  './audit.js?v=19',
+  './?v=20',
+  './index.html?v=20',
+  './app.html?v=20',
+  './styles.css?v=20',
+  './app.js?v=20',
+  './sync.js?v=20',
+  './org.js?v=20',
+  './audit.js?v=20',
   './manifest.json',
   'https://cdn.jsdelivr.net/npm/chart.js'
 ];
@@ -39,18 +40,16 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true })
       .then((response) => {
-        // Return cached version if found
         if (response) {
           return response;
         }
 
-        // Otherwise fetch from network
-        return fetch(event.request).then(
-          (networkResponse) => {
-            // Optional: cache new assets dynamically
-            return networkResponse;
+        return fetch(event.request).catch((err) => {
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html?v=20') || caches.match('./index.html');
           }
-        );
+          throw err;
+        });
       })
   );
 });

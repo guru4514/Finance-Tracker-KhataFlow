@@ -3385,7 +3385,7 @@ function toggleBiometricEnabled() {
  * Helper to download or share files natively in Capacitor Android or Web
  */
 async function shareOrDownloadFile(filename, content, mimeType, isBase64 = false) {
-    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    if (isNativePlatform()) {
         try {
             const { Filesystem, Share } = window.Capacitor.Plugins;
             const options = {
@@ -3539,7 +3539,7 @@ function exportToCSV(type) {
         }
 
         // Trigger download
-        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+        if (isNativePlatform()) {
             const { Filesystem, Directory, Encoding } = Capacitor.Plugins;
             const { Share } = Capacitor.Plugins;
 
@@ -4390,7 +4390,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // === Android Back Button: Double-tap to exit ===
-    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    if (isNativePlatform()) {
         let lastBackPress = 0;
         document.addEventListener('ionBackButton', (ev) => {
             ev.detail.register(10, () => {

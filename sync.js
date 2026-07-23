@@ -10,13 +10,24 @@ let isSyncing = false;
 let unsupportedAuthToastShown = false;
 
 const AUTH_ENVIRONMENT_MESSAGE = "Cloud sign-in needs http://localhost or https://. Start the local web server instead of opening index.html directly.";
-const WEB_AUTH_PROTOCOLS = ['http:', 'https:', 'chrome-extension:'];
+const WEB_AUTH_PROTOCOLS = ['http:', 'https:', 'chrome-extension:', 'capacitor:', 'file:'];
 
 // firebaseConfig is loaded from firebase-config.js (included via script tag in index.html)
 // See firebase-config.example.js for the template.
 
 function isNativePlatform() {
-    return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+    if (typeof window === 'undefined' || !window.Capacitor) return false;
+    if (typeof window.Capacitor.isNativePlatform === 'function') {
+        return window.Capacitor.isNativePlatform();
+    }
+    if (typeof window.Capacitor.isNative === 'boolean') {
+        return window.Capacitor.isNative;
+    }
+    if (typeof window.Capacitor.getPlatform === 'function') {
+        const platform = window.Capacitor.getPlatform();
+        return platform === 'android' || platform === 'ios';
+    }
+    return false;
 }
 
 function isFirebaseAuthEnvironmentSupported() {
@@ -211,6 +222,17 @@ function initFirebase(config) {
         return true;
     } catch (error) {
         console.error("Firebase Initialization Error:", error);
+        // Fallback for offline/failed initialization
+        let initialMode = localStorage.getItem('pigmie_initial_mode');
+        if (initialMode) {
+            if (typeof selectAppMode === 'function') {
+                let orgId = localStorage.getItem('pigmie_active_org');
+                selectAppMode(initialMode, orgId);
+            }
+        } else {
+            const onboardingUI = document.getElementById('onboardingUI');
+            if (onboardingUI) onboardingUI.style.display = 'flex';
+        }
         return false;
     }
 }

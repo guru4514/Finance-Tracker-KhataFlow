@@ -1,74 +1,164 @@
-# Pigmie Record Management System
+# 🐷 Pigmie Record Management System (KhataFlow)
 
-Pigmie is a comprehensive financial record and collection management application designed for agents and organizations to track daily customer collections, manage payments, and maintain detailed audit logs. It features a responsive web interface and is packaged for Android using Capacitor.
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![License](https://img.shields.io/badge/license-ISC-green.svg)
+![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Android-orange.svg)
+![Stack](https://img.shields.io/badge/stack-Vanilla%20JS%20%7C%20Firebase%20%7C%20Capacitor-purple.svg)
 
-## Features
+**Pigmie** (Finance Tracker) is a modern, high-performance financial record and collection management solution tailored for finance agents, daily micro-finance collectors, and loan management organizations. Designed with an offline-first architecture, multi-tenant cloud sync, and native Android support, Pigmie streamlines daily collections, payment audits, and loan passbooks.
 
-### Two Operating Modes
-- **Personal Mode (Offline-First):** Designed for individual agents. Data is stored locally in the browser using IndexedDB, allowing the app to work entirely offline without latency. Users can manually or automatically sync their local data to the cloud (Firebase) as a backup.
-- **Organization Mode (Live Cloud Sync):** Designed for teams. Connects directly to a real-time Firebase Firestore database. All actions are synchronized instantly across all organization members without relying on local caching, preventing data collisions.
+---
 
-### Role-Based Access Control (RBAC)
-When operating in Organization Mode, members are assigned specific roles that govern their permissions:
-- **Owner / Admin:** Full control over the organization. Can create the organization, invite members, approve/reject pending member requests, and approve/reject data changes.
-- **Manager:** Can view records for the entire organization and manage lower-tier staff.
-- **Agent / Collector:** Restricted access. Can only view the customers and payments they are explicitly assigned to or have collected. Cannot freely delete or modify records without approval.
-- **Viewer / Auditor:** Read-only access to organization records for auditing purposes. Cannot modify any data.
+## 🌟 Key Features
 
-### Approval Workflow
-To prevent unauthorized or accidental modifications in Organization Mode, restricted roles (Agents/Collectors) cannot directly edit the live database. Instead, they submit requests for:
-- Adding a new customer
-- Editing an existing customer
-- Deleting a customer
-- Deleting a payment
+### 🔄 Dual Operating Modes
+* **Personal Mode (Offline-First):** Built for independent agents. Leverages browser **IndexedDB** for zero-latency local operations without needing an internet connection. Includes optional manual or scheduled auto-backup to Firebase cloud storage.
+* **Organization Mode (Real-Time Cloud Sync):** Built for multi-agent teams. Connects directly to **Firebase Firestore** with real-time listeners for live collaborative updates and strict cache collision avoidance.
 
-These requests enter a **Pending Approvals** queue visible only to Admins and Managers, who can review and either approve or reject the changes. Approved changes are then automatically merged into the live organization database.
+### 🛂 Granular Role-Based Access Control (RBAC)
+Configurable permission matrices (`permissions.js`) govern access based on organizational roles:
+* **👑 Owner / Admin:** Full control over organization settings, member invitations, role assignments, audit logs, and approval queues.
+* **👔 Manager:** Access to org-wide dashboards, agent performance reports, customer assignments, and approval workflows.
+* **🚶 Agent / Collector:** Operational view restricted to assigned customers and payments. Sensitive modifications are queued for managerial approval.
+* **👁️ Viewer / Auditor:** Read-only compliance access across all financial ledgers.
 
-### Core Tracking
-- **Customers:** Track customer details, contact information, status (Active/Completed/Defaulted), and their expected daily collection amount.
-- **Payments:** Log daily payments against specific customers, including the date, amount, and the agent who collected it.
-- **Dashboard:** Provides an overview of total capital, total collections, pending collections, and a list of top defaulters based on their payment history.
+### 🛡️ Secure Approval Workflow
+To guarantee ledger integrity, actions initiated by restricted roles (e.g., adding customers, deleting payments, closing loans) are submitted to a **Pending Approvals** queue. Admins and Managers review and approve or reject changes before they are committed to Firestore.
 
-## Technology Stack
-- **Frontend:** Pure HTML5, CSS3, and Vanilla JavaScript (No heavy frameworks).
-- **Backend / Database:** Firebase Authentication (Email/Password) and Firebase Firestore (NoSQL Cloud Database).
-- **Local Storage:** IndexedDB for robust offline data persistence.
-- **Mobile Packaging:** Capacitor by Ionic, enabling the web app to be compiled natively into an Android APK (`app-debug.apk`).
+### 📖 Customer Self-Service Portal
+A standalone passbook interface allows end-customers to securely track their payment history, total loans, and remaining balance using their unique **Organization ID** and **Customer ID**.
 
-## Setup and Installation
+### 🔒 Native Android & Biometric Security
+* Integrated with **Capacitor 8** for native Android deployment (`.apk`).
+* Touch ID / Face ID biometric authentication support powered by `@capgo/capacitor-native-biometric`.
+
+### 📊 Dashboard & Financial Analytics
+* Real-time metrics for total capital, daily collections, pending dues, and active loans.
+* Visual analytics powered by **Chart.js**.
+* Automated identification and reporting of top defaulters based on payment velocity.
+
+### 🌐 Multi-Language Typography
+Native typography support for multi-regional deployment, including **Devanagari** and **Kannada** font families alongside standard Inter typography.
+
+---
+
+## 🛠️ Technology Stack
+
+| Category | Technology |
+| :--- | :--- |
+| **Frontend UI** | HTML5, CSS3 (Custom Variables & Modern Glassmorphism), Vanilla JavaScript (ES6+) |
+| **Local Storage** | IndexedDB (Browser Native API) |
+| **Cloud Backend** | Firebase Firestore (Realtime DB), Firebase Authentication |
+| **Mobile Runtime** | Capacitor Core v8, Capacitor Android |
+| **Native Plugins** | Native Biometric Auth, App, Filesystem, Share |
+| **Data Viz** | Chart.js |
+
+---
+
+## 📁 Repository Structure
+
+```text
+Finance/
+├── index.html                   # Core web application markup & onboarding screens
+├── styles.css                   # Global styling system, dark mode, responsive layouts
+├── app.js                       # Primary application state, IndexedDB engine & offline sync
+├── sync.js                      # Firebase Auth state controller & mode switching logic
+├── org.js                       # Organization mode Firestore listeners & multi-user sync
+├── permissions.js               # Centralized RBAC matrix and authorization rules
+├── customer-portal.js           # Self-service customer passbook verification logic
+├── audit.js                     # Activity logging and audit trail system
+├── firebase-config.example.js   # Firebase setup template (copy to firebase-config.js)
+├── firestore.rules              # Firebase Security Rules for database protection
+├── manifest.json                # Web App Manifest for PWA installation
+├── capacitor.config.json        # Native mobile build configuration
+├── scripts/
+│   ├── serve.js                 # Lightweight Node.js local development server
+│   └── sync-web.js              # Build script to copy web assets to dist directory (`www`)
+└── android/                     # Native Android project directory (Gradle project)
+```
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js and npm installed
-- Android Studio (if building the Android APK)
-- A Firebase project with Authentication and Firestore enabled
+* **Node.js** (v16.0.0 or higher) & **npm**
+* **Firebase Project** with Firestore and Authentication enabled
+* **Android Studio & SDK** (Only required for building Android APKs)
 
-### Web Development
-1. Clone the repository.
-2. Ensure your Firebase configuration keys are placed correctly in `app.js`.
-3. Start a local web server to serve the directory:
-   ```bash
-   node scripts/serve.js
-   ```
-4. Access the app in your browser at `http://localhost:8080`.
+---
 
-### Android Build (Capacitor)
-To build the Android application:
-1. Install dependencies (if any).
-2. Sync the web assets with the Android project:
-   ```bash
-   npx cap sync android
-   ```
-3. Open the project in Android Studio or build it via the command line:
-   ```bash
-   cd android
-   ./gradlew assembleDebug
-   ```
-4. The generated APK will be located at `android/app/build/outputs/apk/debug/app-debug.apk`.
+### 💻 Web Development Setup
 
-## File Structure Highlights
-- `index.html`: The main entry point and UI structure.
-- `index.css`: Application styling, responsive design, and CSS variables.
-- `app.js`: Core application logic, IndexedDB handling, UI rendering, and Personal Mode syncing.
-- `org.js`: Organization mode logic, real-time Firestore listeners, RBAC enforcement, and Approval workflows.
-- `sync.js`: Firebase Authentication state management and mode selection (Personal vs. Organization).
-- `audit.js`: (Optional) Logic for tracking detailed audit logs of all actions performed within an organization.
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd Finance
+   ```
+
+2. **Configure Firebase:**
+   Copy the example template and fill in your Firebase credentials:
+   ```bash
+   cp firebase-config.example.js firebase-config.js
+   ```
+   *Edit `firebase-config.js` with your Firebase Console credentials (`apiKey`, `projectId`, `authDomain`, etc.).*
+
+3. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
+
+4. **Run Development Server:**
+   ```bash
+   npm run web
+   ```
+   Open your browser at **`http://localhost:8080`**.
+
+---
+
+### 📱 Android Application Setup (Capacitor)
+
+1. **Synchronize Web Assets:**
+   ```bash
+   npm run android:sync
+   ```
+
+2. **Open in Android Studio:**
+   ```bash
+   npm run android:open
+   ```
+
+3. **Build Debug APK via CLI:**
+   ```bash
+   npm run android:build
+   ```
+   The compiled APK will be located at:
+   `android/app/build/outputs/apk/debug/app-debug.apk`
+
+---
+
+## 📜 NPM Scripts Reference
+
+| Command | Description |
+| :--- | :--- |
+| `npm run web` | Launches the local Node.js web server (`scripts/serve.js`) |
+| `npm run sync:web` | Bundles and syncs web root assets to the `www/` directory |
+| `npm run android:add` | Initializes the Capacitor Android platform directory |
+| `npm run android:sync` | Syncs web assets and updates Capacitor Android plugins |
+| `npm run android:open` | Opens the native Android project in Android Studio |
+| `npm run android:build` | Compiles the Android project into a debug APK (`app-debug.apk`) |
+
+---
+
+## 🔒 Database Security
+
+Ensure your Firestore database rules are configured using `firestore.rules`. Key rules include:
+* **Customers & Payments:** Read access granted to organization members; write access guarded by role permissions and approval requirements.
+* **Customer Passbook Public Lookup:** Read-only access enabled for passbook lookups matching specific `orgId` and `customerId`.
+
+---
+
+## 📄 License
+
+This project is private software licensed under the **ISC License**.
+
