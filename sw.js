@@ -1,13 +1,13 @@
-const CACHE_NAME = 'pigmie-cache-v20';
+const CACHE_NAME = 'pigmie-cache-v21';
 const ASSETS_TO_CACHE = [
-  './?v=20',
-  './index.html?v=20',
-  './app.html?v=20',
-  './styles.css?v=20',
-  './app.js?v=20',
-  './sync.js?v=20',
-  './org.js?v=20',
-  './audit.js?v=20',
+  './?v=21',
+  './index.html?v=21',
+  './app.html?v=21',
+  './styles.css?v=21',
+  './app.js?v=21',
+  './sync.js?v=21',
+  './org.js?v=21',
+  './audit.js?v=21',
   './manifest.json',
   'https://cdn.jsdelivr.net/npm/chart.js'
 ];
@@ -46,7 +46,7 @@ self.addEventListener('fetch', (event) => {
 
         return fetch(event.request).catch((err) => {
           if (event.request.mode === 'navigate') {
-            return caches.match('./index.html?v=20') || caches.match('./index.html');
+            return caches.match('./app.html?v=21') || caches.match('./app.html') || caches.match('./index.html?v=21') || caches.match('./index.html');
           }
           throw err;
         });
