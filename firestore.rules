@@ -39,9 +39,11 @@ service cloud.firestore {
       
       // Customers
       match /customers/{customerId} {
-        allow get: if true; // Allows Customer Portal to fetch by ID
+        allow get: if isOrgMember(orgId) || request.auth != null;
         allow list: if isOrgMember(orgId);
-        allow create: if isOrgMember(orgId);
+        allow create: if isOrgMember(orgId)
+                      && request.resource.data.name is string 
+                      && request.resource.data.name.size() > 0;
         allow update: if isPrivileged(orgId) 
                       || resource.data.assignedAgent == request.auth.uid;
         allow delete: if getMemberRole(orgId) in ['owner', 'admin'];
@@ -49,9 +51,11 @@ service cloud.firestore {
       
       // Payments
       match /payments/{paymentId} {
-        allow read: if true; // Allows Customer Portal to fetch payments
-        allow list: if isOrgMember(orgId) || true; // Using read: if true makes this redundant, but leaving logic for clarity
-        allow create: if isOrgMember(orgId);
+        allow get: if isOrgMember(orgId) || request.auth != null;
+        allow list: if isOrgMember(orgId);
+        allow create: if isOrgMember(orgId)
+                      && request.resource.data.amount is number 
+                      && request.resource.data.amount > 0;
         allow update: if isPrivileged(orgId);
         allow delete: if getMemberRole(orgId) in ['owner', 'admin'];
       }

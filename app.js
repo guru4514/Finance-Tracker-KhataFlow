@@ -954,7 +954,7 @@ function updatePageTitle() {
 
 // === Helpers ===
 function generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+    return Date.now().toString(36) + Math.random().toString(36).substring(2, 11);
 }
 
 function generateCustomerId() {
@@ -1388,7 +1388,7 @@ function refreshDashboard() {
 
     // Recent Payments
     const recentPaymentsEl = document.getElementById('recentPayments');
-    const recentPayments = payments.sort((a, b) => {
+    const recentPayments = [...payments].sort((a, b) => {
         const dateCompare = new Date(b.date) - new Date(a.date);
         if (dateCompare !== 0) return dateCompare;
         return (b.timestamp || 0) - (a.timestamp || 0);
@@ -1841,10 +1841,14 @@ async function saveCustomer(event) {
             deadline,
             status: 'active',
             createdAt: getTodayStr()
-        };
     }
 
     if (customerObj) {
+        const newPhoto = document.getElementById('customerPhotoBase64').value;
+        const newIdProof = document.getElementById('idProofBase64').value;
+        if (newPhoto) customerObj.photo = newPhoto;
+        if (newIdProof) customerObj.idProof = newIdProof;
+
         // Tag with agent if in org mode
         if (typeof appMode !== 'undefined' && appMode === 'org' && typeof currentUser !== 'undefined' && currentUser) {
             const assignedGroup = document.getElementById('assignedAgentGroup');
@@ -2181,7 +2185,7 @@ function closeEditPayment() {
     if (overlay) overlay.remove();
 }
 
-function savePaymentEdit(paymentId, customerId) {
+async function savePaymentEdit(paymentId, customerId) {
     const newAmount = parseFloat(document.getElementById('editPaymentAmount').value);
     const newDate = document.getElementById('editPaymentDate').value;
 
@@ -2192,7 +2196,11 @@ function savePaymentEdit(paymentId, customerId) {
     if (index !== -1) {
         payments[index].amount = newAmount;
         payments[index].date = newDate;
-        savePayments(payments);
+        if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbSavePayment === 'function') {
+            await dbSavePayment(payments[index]);
+        } else {
+            savePayments(payments);
+        }
         closeEditPayment();
         showToast(t('paymentUpdated'));
         viewCustomerDetail(customerId);
@@ -2673,8 +2681,9 @@ function refreshRecordsList() {
     container.innerHTML = filtered.map((c, index) => {
         const payments = getCustomerPayments(c.id);
         const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
-        const pending = Math.max(0, c.loanAmount - totalPaid);
-        const progress = c.loanAmount > 0 ? Math.min(100, (totalPaid / c.loanAmount) * 100) : 0;
+        const totalRepayable = calculateTotalRepayable(c);
+        const pending = Math.max(0, totalRepayable - totalPaid);
+        const progress = totalRepayable > 0 ? Math.min(100, (totalPaid / totalRepayable) * 100) : 0;
         const customerType = getCustomerType(c);
         const amountLabel = getCustomerAmountLabel(c);
 
@@ -3491,8 +3500,8 @@ function exportToCSV(type) {
                     `"${getDisplayName(c)}"`,
                     c.phone,
                     `"${c.area || ''}"`,
-                    c.type,
-                    c.amount,
+                    c.customerType || 'loan',
+                    c.loanAmount,
                     c.interestRate || 0,
                     c.issuedDate,
                     c.deadline,
@@ -4430,7 +4439,18 @@ function handleImageUpload(event, previewId, base64Id, isRect = false) {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Show a small loading indicator if desired, or just process
+    // Security & Storage Validation: Max 5MB & Image type only
+    if (file.size > 5 * 1024 * 1024) {
+        showToast('Image file size must be less than 5MB', 'error');
+        event.target.value = '';
+        return;
+    }
+    if (!file.type || !file.type.startsWith('image/')) {
+        showToast('Please select a valid image file', 'error');
+        event.target.value = '';
+        return;
+    }
+
     compressImage(file, isRect ? 1024 : 500, (base64) => {
         document.getElementById(base64Id).value = base64;
 

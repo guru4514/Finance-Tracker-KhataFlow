@@ -5,6 +5,18 @@ let currentOrg = null;
 let appMode = localStorage.getItem('pigmie_app_mode');
 let _orgMembersCache = [];
 
+function showLoading(show) {
+    let overlay = document.getElementById('loadingOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'loadingOverlay';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;';
+        overlay.innerHTML = '<div style="color:white;font-size:16px;text-align:center;"><div style="width:36px;height:36px;border:3px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>Loading...</div>';
+        document.body.appendChild(overlay);
+    }
+    overlay.style.display = show ? 'flex' : 'none';
+}
+
 let orgCustomersUnsubscribe = null;
 let orgPaymentsUnsubscribe = null;
 let orgMembersUnsubscribe = null;
@@ -490,9 +502,9 @@ async function showInviteCode() {
     // Attempt to copy to clipboard
     try {
         await navigator.clipboard.writeText(currentOrg.id);
-        alert(`Organization ID: ${currentOrg.id}\n\n(Copied to clipboard)\n\nShare this ID with new users. They will enter it when joining the organization and you will need to approve their request in the Pending Approvals section.`);
+        showToast(`Org ID copied to clipboard: ${currentOrg.id}`, 'success');
     } catch (err) {
-        alert(`Organization ID: ${currentOrg.id}\n\nShare this ID with new users. They will enter it when joining the organization and you will need to approve their request in the Pending Approvals section.`);
+        showToast(`Org ID: ${currentOrg.id}`, 'info');
     }
 }
 

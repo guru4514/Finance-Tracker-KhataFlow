@@ -3,22 +3,35 @@
 // ========================================
 
 function showCustomerPortalLogin() {
-    document.getElementById('onboardingUI').style.display = 'none';
-    document.getElementById('customerPortalUI').style.display = 'block';
-    document.getElementById('customerPortalLogin').style.display = 'block';
-    document.getElementById('customerPortalPassbook').style.display = 'none';
-    document.getElementById('trackCustomerId').value = '';
+    const onboardingUI = document.getElementById('onboardingUI');
+    const portalUI = document.getElementById('customerPortalUI');
+    const loginSection = document.getElementById('customerPortalLogin');
+    const passbookSection = document.getElementById('customerPortalPassbook');
+    const trackInput = document.getElementById('trackCustomerId');
+
+    if (onboardingUI) onboardingUI.style.display = 'none';
+    if (portalUI) portalUI.style.display = 'block';
+    if (loginSection) loginSection.style.display = 'block';
+    if (passbookSection) passbookSection.style.display = 'none';
+    if (trackInput) trackInput.value = '';
 }
 
 function hideCustomerPortalLogin() {
-    document.getElementById('customerPortalUI').style.display = 'none';
-    document.getElementById('onboardingUI').style.display = 'block';
+    const onboardingUI = document.getElementById('onboardingUI');
+    const portalUI = document.getElementById('customerPortalUI');
+
+    if (portalUI) portalUI.style.display = 'none';
+    if (onboardingUI) onboardingUI.style.display = 'block';
 }
 
 function resetCustomerPortal() {
-    document.getElementById('customerPortalPassbook').style.display = 'none';
-    document.getElementById('customerPortalLogin').style.display = 'block';
-    document.getElementById('trackCustomerId').value = '';
+    const loginSection = document.getElementById('customerPortalLogin');
+    const passbookSection = document.getElementById('customerPortalPassbook');
+    const trackInput = document.getElementById('trackCustomerId');
+
+    if (passbookSection) passbookSection.style.display = 'none';
+    if (loginSection) loginSection.style.display = 'block';
+    if (trackInput) trackInput.value = '';
 }
 
 async function trackCustomerPassbook() {
