@@ -1,13 +1,15 @@
-const CACHE_NAME = 'pigmie-cache-v21';
+const CACHE_NAME = 'pigmie-cache-v22';
 const ASSETS_TO_CACHE = [
-  './?v=21',
-  './index.html?v=21',
-  './app.html?v=21',
-  './styles.css?v=21',
-  './app.js?v=21',
-  './sync.js?v=21',
-  './org.js?v=21',
-  './audit.js?v=21',
+  './?v=22',
+  './index.html?v=22',
+  './app.html?v=22',
+  './styles.css?v=22',
+  './landing/landing.css?v=22',
+  './landing/landing.js?v=22',
+  './app.js?v=22',
+  './sync.js?v=22',
+  './org.js?v=22',
+  './audit.js?v=22',
   './manifest.json',
   'https://cdn.jsdelivr.net/npm/chart.js'
 ];
