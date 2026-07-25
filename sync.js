@@ -204,7 +204,7 @@ function initFirebase(config) {
                 } else {
                     // Personal mode
                     await selectAppMode(initialMode);
-                    await pullFromCloud(true); // Pull cloud data to local on login
+                    await syncPersonalData(); // Smart 2-way sync preserving offline records
                 }
             } else {
                 console.log("Firebase Auth: Logged out");
@@ -508,6 +508,99 @@ async function pullFromCloud(force = false) {
         updateSyncUI();
     }
 }
+
+/**
+ * Smart Two-Way Personal Data Sync
+ * Merges local offline records (customers/payments) with cloud records by ID,
+ * preserving offline additions while incorporating cloud updates.
+ */
+async function syncPersonalData() {
+    if (!cloudDb || !currentUser || isSyncing) return;
+    if (typeof appMode !== 'undefined' && appMode === 'org') return;
+
+    isSyncing = true;
+    updateSyncUI();
+
+    try {
+        // MUST wait for IndexedDB to initialize so local records are actually loaded into memory cache
+        if (window.dbInitializedPromise) {
+            await window.dbInitializedPromise;
+        }
+
+        const userRef = cloudDb.collection('users').doc(currentUser.uid);
+        const doc = await userRef.get();
+
+        const localCustomers = typeof getCustomers === 'function' ? getCustomers() : [];
+        const localPayments = typeof getPayments === 'function' ? getPayments() : [];
+
+        if (doc.exists) {
+            const data = doc.data();
+            const cloudCustomers = JSON.parse(data.customers || '[]');
+            const cloudPayments = JSON.parse(data.payments || '[]');
+
+            // 1. Merge Customers by ID (preserving offline additions & updates)
+            const customerMap = new Map();
+            cloudCustomers.forEach(c => { if (c && c.id) customerMap.set(c.id, c); });
+            localCustomers.forEach(c => {
+                if (c && c.id) {
+                    if (customerMap.has(c.id)) {
+                        customerMap.set(c.id, { ...customerMap.get(c.id), ...c });
+                    } else {
+                        customerMap.set(c.id, c);
+                    }
+                }
+            });
+            const mergedCustomers = Array.from(customerMap.values());
+
+            // 2. Merge Payments by ID (preserving offline daily entries)
+            const paymentMap = new Map();
+            cloudPayments.forEach(p => { if (p && p.id) paymentMap.set(p.id, p); });
+            localPayments.forEach(p => { if (p && p.id) paymentMap.set(p.id, p); });
+            const mergedPayments = Array.from(paymentMap.values());
+
+            // 3. Save merged data locally
+            if (typeof saveCustomers === 'function') saveCustomers(mergedCustomers);
+            if (typeof savePayments === 'function') savePayments(mergedPayments);
+
+            // 4. Update cloud document with merged state
+            const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+            await userRef.set({
+                customers: JSON.stringify(mergedCustomers),
+                payments: JSON.stringify(mergedPayments),
+                lastSynced: timestamp,
+                email: currentUser.email
+            });
+
+            if (typeof getSettings === 'function' && typeof saveSettings === 'function') {
+                const settings = getSettings();
+                settings.lastSynced = new Date().toISOString();
+                saveSettings(settings);
+            }
+
+            console.log("Smart offline-first sync completed successfully.");
+
+            if (typeof refreshCurrentView === 'function') {
+                refreshCurrentView();
+            }
+        } else {
+            // First time cloud sync for new account
+            await pushToCloud(false);
+        }
+    } catch (error) {
+        console.error("Auto Sync Error:", error);
+    } finally {
+        isSyncing = false;
+        updateSyncUI();
+    }
+}
+
+// Automatically trigger smart sync when internet re-connects
+window.addEventListener('online', () => {
+    if (typeof showToast === 'function') {
+        showToast("Network restored. Syncing offline data...", "info");
+    }
+    syncPersonalData();
+});
 
 /**
  * Update the Sync UI in Settings

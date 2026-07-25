@@ -4375,18 +4375,25 @@ async function init() {
     });
 }
 
+window.dbInitializedPromise = new Promise((resolve) => {
+    window._resolveDbInitialized = resolve;
+});
+
 // Run on load
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize IndexedDB then start app
     if ('indexedDB' in window) {
         initDB().then(() => {
             init();
+            window._resolveDbInitialized(true);
         }).catch(err => {
             console.error("Failed to initialize IndexedDB. Falling back to localStorage?", err);
             init(); // Try to load anyway
+            window._resolveDbInitialized(false);
         });
     } else {
         init();
+        window._resolveDbInitialized(false);
     }
 
     // Register Service Worker
