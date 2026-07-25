@@ -1827,6 +1827,8 @@ async function saveCustomer(event) {
             customerObj = { ...existing, name, phone, area, customerType, loanAmount, interestRate, issuedDate, deadline };
             showToast(t('customerUpdated'));
         }
+    } else {
+        // Add new
         customerObj = {
             id: generateCustomerId(),
             name,
