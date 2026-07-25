@@ -4,13 +4,13 @@
 */
 
 :root {
-    /* Color Palette */
-    --bg-dark: #0a0a1a;
-    --bg-darker: #05050f;
-    --primary: #6C63FF;
-    --primary-hover: #5A51E6;
-    --secondary: #00D4AA;
-    --accent: #FF6B6B;
+    /* Color Palette — Deep Navy + Emerald Green */
+    --bg-dark: #0a0e1a;
+    --bg-darker: #050811;
+    --primary: #10b981;
+    --primary-hover: #059669;
+    --secondary: #6366f1;
+    --accent: #f59e0b;
     
     /* Text Colors */
     --text-primary: #ffffff;
