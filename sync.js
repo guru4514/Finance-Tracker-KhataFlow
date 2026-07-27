@@ -68,17 +68,31 @@ function canUseCloudAuth() {
 }
 
 /**
+ * Splash overlay helpers — provides user feedback during startup sync
+ */
+function updateSplash(message) {
+    const el = document.getElementById('splashText');
+    if (el) el.textContent = message;
+}
+function hideSplash() {
+    const splash = document.getElementById('syncSplash');
+    if (splash) splash.classList.add('hidden');
+}
+
+/**
  * Initialize Firebase with the provided configuration.
  * @param {Object} config - Firebase configuration object
  */
 function initFirebase(config) {
     if (!canUseCloudAuth()) {
         console.warn("Firebase Auth is unavailable for protocol:", window.location.protocol);
+        hideSplash();
         return false;
     }
 
     if (!config || !config.apiKey) {
         console.warn("Firebase config is missing or invalid.");
+        hideSplash();
         return false;
     }
 
@@ -113,6 +127,7 @@ function initFirebase(config) {
 
             if (user) {
                 console.log("Firebase Auth: Logged in as", user.email);
+                updateSplash('Authenticating...');
 
                 let initialMode = localStorage.getItem('pigmie_initial_mode');
                 let initialRole = localStorage.getItem('pigmie_initial_role');
@@ -201,13 +216,17 @@ function initFirebase(config) {
                                 });
                         }
                     }
+                    hideSplash();
                 } else {
                     // Personal mode
+                    updateSplash('Syncing your data...');
                     await selectAppMode(initialMode);
                     await syncPersonalData(); // Smart 2-way sync preserving offline records
+                    hideSplash();
                 }
             } else {
                 console.log("Firebase Auth: Logged out");
+                hideSplash();
                 // Check if they need onboarding
                 if (localStorage.getItem('pigmie_initial_mode')) {
                     if (loginUI) loginUI.classList.add('active');
@@ -220,6 +239,7 @@ function initFirebase(config) {
         return true;
     } catch (error) {
         console.error("Firebase Initialization Error:", error);
+        hideSplash();
         // Fallback for offline/failed initialization
         let initialMode = localStorage.getItem('pigmie_initial_mode');
         if (initialMode) {
