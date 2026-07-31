@@ -39,7 +39,7 @@ service cloud.firestore {
       
       // Customers
       match /customers/{customerId} {
-        allow get: if request.auth != null;
+        allow get: if true; // Allow unauthenticated Customer Portal access
         allow list: if isOrgMember(orgId);
         allow create: if isOrgMember(orgId)
                       && request.resource.data.name is string 
@@ -53,7 +53,7 @@ service cloud.firestore {
       // Payments
       match /payments/{paymentId} {
         allow get: if request.auth != null;
-        allow list: if isOrgMember(orgId);
+        allow list: if isOrgMember(orgId); // Restored security: unauthenticated users CANNOT list payments
         allow create: if isOrgMember(orgId)
                       && request.resource.data.amount is number 
                       && request.resource.data.amount > 0

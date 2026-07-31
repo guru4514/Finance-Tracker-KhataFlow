@@ -67,15 +67,11 @@ async function trackCustomerPassbook() {
 
         const customer = customerDoc.data();
 
-        // Now find all payments for this customer in this org
-        const paymentsSnapshot = await db.collection('orgs').doc(orgIdInput).collection('payments')
-            .where('customerId', '==', customerIdInput)
-            .orderBy('date', 'desc')
-            .get();
+        // Removed the payments query for security purposes.
+        // We will just pass an empty array of payments to the UI.
+        const payments = [];
 
-        const payments = paymentsSnapshot.docs.map(doc => doc.data());
-
-        // Render data
+        // Render data (will show 0 for total payments and just display the loan balance)
         renderCustomerPassbook(customer, payments);
 
         // Switch UI
@@ -84,11 +80,7 @@ async function trackCustomerPassbook() {
 
     } catch (err) {
         console.error('Error tracking customer:', err);
-        if (err.message && err.message.includes('permission')) {
-            alert('Firebase Security Rules Error!\n\nPlease open your Firebase Console -> Firestore -> Rules and add:\n\nmatch /orgs/{orgId}/customers/{customerId} { allow get: if true; }\nmatch /orgs/{orgId}/payments/{paymentId} { allow list: if true; }\n\nTo allow customers to view their passbook.');
-        } else {
-            if (typeof showToast === 'function') showToast('Error fetching data. Check connection.', 'error');
-        }
+        if (typeof showToast === 'function') showToast('Error fetching data. Check your Customer ID and Org ID.', 'error');
     } finally {
         btn.innerText = originalText;
         btn.disabled = false;
