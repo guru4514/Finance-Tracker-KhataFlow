@@ -3,6 +3,19 @@
    ======================================== */
 
 // === Data Store (localStorage) ===
+
+/**
+ * Escapes HTML special characters to prevent XSS injection.
+ * Use this for any user-provided text rendered via innerHTML.
+ */
+function escapeHTML(str) {
+    if (typeof str !== 'string') return str;
+    return str.replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#039;');
+}
 const STORAGE_KEYS = {
     CUSTOMERS: 'pigmie_customers',
     PAYMENTS: 'pigmie_payments',
@@ -1473,10 +1486,10 @@ function refreshDashboard() {
                 return `
                     <div class="attention-item">
                         <div class="attention-info">
-                            <h4>${c.name}</h4>
-                            <p>${c.phone} - ${t('pending')}: ${formatCurrency(pending)}</p>
+                            <h4>${escapeHTML(c.name)}</h4>
+                            <p>${escapeHTML(c.phone)} - ${t('pending')}: ${formatCurrency(pending)}</p>
                         </div>
-                        <button class="btn-whatsapp" onclick="sendReminder('${c.phone}', '${formatCurrency(pending)}', '${c.name}')" style="padding: 6px; border-radius: 50%;">
+                        <button class="btn-whatsapp" onclick="sendReminder('${escapeHTML(c.phone)}', '${formatCurrency(pending)}', '${escapeHTML(c.name)}')" style="padding: 6px; border-radius: 50%;">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
                         </button>
                     </div>`;
@@ -1517,7 +1530,7 @@ function refreshDashboard() {
             return `
                 <div class="deadline-item">
                     <div class="deadline-info">
-                        <div class="deadline-name">${c.name}</div>
+                        <div class="deadline-name">${escapeHTML(c.name)}</div>
                         <div class="deadline-date">${formatDate(c.deadline)}</div>
                     </div>
                     <span class="deadline-badge ${badgeClass}">${badgeText}</span>
@@ -1610,8 +1623,8 @@ function refreshCustomersList() {
                     <div class="customer-info">
                         ${getAvatarHtml(c, 'customer-avatar')}
                         <div>
-                            <div class="customer-name">${index + 1}. ${c.name}</div>
-                            <div class="customer-phone">${c.phone}</div>
+                            <div class="customer-name">${index + 1}. ${escapeHTML(c.name)}</div>
+                            <div class="customer-phone">${escapeHTML(c.phone)}</div>
                             <div class="customer-phone" style="font-family: monospace; font-size: 11px; margin-bottom: 4px;">ID: ${c.id}</div>
                             <span class="customer-type-badge ${customerType}">${getCustomerTypeLabel(c)}</span>
                             <span class="status-badge ${status}">${t(isClosed ? 'statusClosed' : 'statusActive')}</span>

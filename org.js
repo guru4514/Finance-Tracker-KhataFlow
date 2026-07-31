@@ -191,11 +191,11 @@ function refreshOrgDashboard() {
         <div style="display: flex; flex-direction: column; padding: 16px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 8px;">
             <div style="display: flex; align-items: center; margin-bottom: 12px;">
                 <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px;">
-                    ${(member.displayName || member.email || '?').charAt(0).toUpperCase()}
+                    ${escapeHTML((member.displayName || member.email || '?').charAt(0).toUpperCase())}
                 </div>
                 <div style="flex: 1;">
-                    <h4 style="margin: 0; font-size: 16px;">${member.displayName || member.email}</h4>
-                    <p style="margin: 0; font-size: 12px; color: var(--text-secondary); text-transform: capitalize;">Role: ${member.role}</p>
+                    <h4 style="margin: 0; font-size: 16px;">${escapeHTML(member.displayName || member.email)}</h4>
+                    <p style="margin: 0; font-size: 12px; color: var(--text-secondary); text-transform: capitalize;">Role: ${escapeHTML(member.role)}</p>
                 </div>
                 <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="viewAgentActivity('${member.uid}')">Activity</button>
             </div>

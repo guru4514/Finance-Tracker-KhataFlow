@@ -10,7 +10,8 @@
     "android:add": "npm run sync:web && cap add android",
     "android:sync": "npm run sync:web && cap sync android",
     "android:open": "npm run android:sync && cap open android",
-    "android:build": "npm run android:sync && cd android && gradlew.bat assembleDebug"
+    "android:build": "npm run android:sync && cd android && gradlew.bat assembleDebug",
+    "deploy": "node scripts/bump-version.js && npm run android:build"
   },
   "main": "app.js",
   "keywords": [],

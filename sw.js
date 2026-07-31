@@ -1,15 +1,15 @@
-const CACHE_NAME = 'pigmie-cache-v22';
+const CACHE_NAME = 'pigmie-cache-v23';
 const ASSETS_TO_CACHE = [
-  './?v=22',
-  './index.html?v=22',
-  './app.html?v=22',
-  './styles.css?v=22',
-  './landing/landing.css?v=22',
-  './landing/landing.js?v=22',
-  './app.js?v=22',
-  './sync.js?v=22',
-  './org.js?v=22',
-  './audit.js?v=22',
+  './?v=23',
+  './index.html?v=23',
+  './app.html?v=23',
+  './styles.css?v=23',
+  './landing/landing.css?v=23',
+  './landing/landing.js?v=23',
+  './app.js?v=23',
+  './sync.js?v=23',
+  './org.js?v=23',
+  './audit.js?v=23',
   './manifest.json',
   'https://cdn.jsdelivr.net/npm/chart.js'
 ];
@@ -48,7 +48,7 @@ self.addEventListener('fetch', (event) => {
 
         return fetch(event.request).catch((err) => {
           if (event.request.mode === 'navigate') {
-            return caches.match('./app.html?v=21') || caches.match('./app.html') || caches.match('./index.html?v=21') || caches.match('./index.html');
+            return caches.match('./app.html?v=23') || caches.match('./app.html') || caches.match('./index.html?v=23') || caches.match('./index.html');
           }
           throw err;
         });
