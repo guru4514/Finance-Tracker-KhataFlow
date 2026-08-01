@@ -67,12 +67,9 @@ async function trackCustomerPassbook() {
 
         const customer = customerDoc.data();
 
-        // Removed the payments query for security purposes.
-        // We will just pass an empty array of payments to the UI.
-        const payments = [];
-
-        // Render data (will show 0 for total payments and just display the loan balance)
-        renderCustomerPassbook(customer, payments);
+        // Use totalPaid stored on the customer document (updated whenever a payment is recorded)
+        // This is secure because we only need a single 'get' on the customer doc, no payment list query needed
+        renderCustomerPassbook(customer);
 
         // Switch UI
         document.getElementById('customerPortalLogin').style.display = 'none';
@@ -87,30 +84,19 @@ async function trackCustomerPassbook() {
     }
 }
 
-function renderCustomerPassbook(customer, payments) {
+function renderCustomerPassbook(customer) {
     document.getElementById('passbookCustomerName').innerText = customer.name || 'Unknown';
     document.getElementById('passbookAgentName').innerText = 'Agent: ' + (customer.assignedAgentName || 'Unknown');
-    document.getElementById('passbookTotalLoan').innerText = '₹' + (customer.loanAmount || 0).toLocaleString();
+    
+    const loanAmount = customer.loanAmount || 0;
+    const totalPaid = customer.totalPaid || 0;
+    const remaining = Math.max(0, loanAmount - totalPaid);
 
-    // Calculate payments total
-    let totalPaid = 0;
-    const paymentsListHtml = payments.map(p => {
-        totalPaid += (p.amount || 0);
-        return `
-            <tr>
-                <td>${p.date || 'Unknown'}</td>
-                <td style="color: var(--success-color); font-weight: 500;">₹${(p.amount || 0).toLocaleString()}</td>
-            </tr>
-        `;
-    }).join('');
-
-    const remaining = Math.max(0, (customer.loanAmount || 0) - totalPaid);
+    document.getElementById('passbookTotalLoan').innerText = '₹' + loanAmount.toLocaleString();
+    document.getElementById('passbookTotalPaid').innerText = '₹' + totalPaid.toLocaleString();
     document.getElementById('passbookRemaining').innerText = '₹' + remaining.toLocaleString();
 
+    // Show payment history note
     const tbody = document.getElementById('passbookPaymentsList');
-    if (payments.length > 0) {
-        tbody.innerHTML = paymentsListHtml;
-    } else {
-        tbody.innerHTML = `<tr><td colspan="2" style="text-align: center; color: var(--text-secondary);">No payments found.</td></tr>`;
-    }
+    tbody.innerHTML = `<tr><td colspan="2" style="text-align: center; color: var(--text-secondary); padding: 24px;">Payment history is only visible inside the app for security reasons.</td></tr>`;
 }

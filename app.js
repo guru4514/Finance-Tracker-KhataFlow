@@ -1178,6 +1178,29 @@ function getCustomerPayments(customerId) {
     return getPayments().filter(p => p.customerId === customerId).sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
+// Updates the totalPaid field on a customer document so the Customer Portal can show accurate balances
+async function updateCustomerTotalPaid(customerId) {
+    const totalPaid = getCustomerTotalPaid(customerId);
+    
+    if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbSaveCustomer === 'function') {
+        const customers = getCustomers();
+        const customer = customers.find(c => c.id === customerId);
+        if (customer) {
+            customer.totalPaid = totalPaid;
+            await dbSaveCustomer(customer);
+        }
+    } else {
+        const customers = getCustomers();
+        const customer = customers.find(c => c.id === customerId);
+        if (customer) {
+            customer.totalPaid = totalPaid;
+            const idx = customers.findIndex(c => c.id === customerId);
+            if (idx !== -1) customers[idx] = customer;
+            saveCustomers(customers);
+        }
+    }
+}
+
 function getCustomerType(customer) {
     return customer && customer.customerType === 'saving' ? 'saving' : 'loan';
 }
@@ -2155,10 +2178,12 @@ async function deletePayment(paymentId, customerId) {
             showToast(typeof t === 'function' ? t('actionUndone') : 'Action undone');
             viewCustomerDetail(customerId);
             refreshCurrentView();
+            updateCustomerTotalPaid(customerId); // Re-sync after undo
         }
     });
     viewCustomerDetail(customerId);
     refreshCurrentView();
+    updateCustomerTotalPaid(customerId); // Sync totalPaid after delete
 }
 
 // === Edit Payment ===
@@ -2219,6 +2244,7 @@ async function savePaymentEdit(paymentId, customerId) {
         showToast(t('paymentUpdated'));
         viewCustomerDetail(customerId);
         refreshCurrentView();
+        updateCustomerTotalPaid(customerId); // Sync totalPaid after edit
     }
 }
 
@@ -2509,9 +2535,13 @@ async function submitDailyEntry(customerId) {
 
             showToast(t('actionUndone'));
             refreshCurrentView();
+            updateCustomerTotalPaid(customerId); // Re-sync after undo
         }
     });
     refreshCurrentView();
+
+    // Update totalPaid on customer document for Customer Portal
+    updateCustomerTotalPaid(customerId);
 
     // Check if loan is fully paid and prompt to close
     if (customer && customer.status !== 'closed' && getCustomerType(customer) !== 'saving') {
@@ -2639,12 +2669,21 @@ async function processBulkCollect() {
                 savePayments(currentPayments);
             }
 
+            // Re-sync totalPaid for all affected customers after undo
+            for (const cb of selectedCheckboxes) {
+                updateCustomerTotalPaid(cb.value);
+            }
             showToast(t('actionUndone'));
             refreshCurrentView();
         }
     });
     refreshCurrentView();
     updateBulkActionBar(); // Will hide it since checkboxes will be unmounted
+
+    // Update totalPaid on customer documents for Customer Portal
+    for (const cb of selectedCheckboxes) {
+        updateCustomerTotalPaid(cb.value);
+    }
 }
 
 // === Reminders ===
@@ -2878,9 +2917,11 @@ async function deletePaymentFromRecords(paymentId, customerId) {
 
             showToast(typeof t === 'function' ? t('actionUndone') : 'Action undone');
             refreshCurrentView();
+            updateCustomerTotalPaid(customerId); // Re-sync after undo
         }
     });
     refreshCurrentView();
+    updateCustomerTotalPaid(customerId); // Sync totalPaid after delete
 }
 
 // === Reports & Analytics ===
