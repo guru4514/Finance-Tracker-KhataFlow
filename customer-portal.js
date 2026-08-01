@@ -96,7 +96,18 @@ function renderCustomerPassbook(customer) {
     document.getElementById('passbookTotalPaid').innerText = '₹' + totalPaid.toLocaleString();
     document.getElementById('passbookRemaining').innerText = '₹' + remaining.toLocaleString();
 
-    // Show payment history note
+    // Render payment history from recentPayments stored on the customer document
+    const payments = customer.recentPayments || [];
     const tbody = document.getElementById('passbookPaymentsList');
-    tbody.innerHTML = `<tr><td colspan="2" style="text-align: center; color: var(--text-secondary); padding: 24px;">Payment history is only visible inside the app for security reasons.</td></tr>`;
+    
+    if (payments.length > 0) {
+        tbody.innerHTML = payments.map(p => `
+            <tr>
+                <td>${p.date || 'Unknown'}</td>
+                <td style="color: var(--success-color); font-weight: 500;">₹${(p.amount || 0).toLocaleString()}</td>
+            </tr>
+        `).join('');
+    } else {
+        tbody.innerHTML = `<tr><td colspan="2" style="text-align: center; color: var(--text-secondary); padding: 24px;">No payments recorded yet.</td></tr>`;
+    }
 }

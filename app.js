@@ -1178,15 +1178,24 @@ function getCustomerPayments(customerId) {
     return getPayments().filter(p => p.customerId === customerId).sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
-// Updates the totalPaid field on a customer document so the Customer Portal can show accurate balances
+// Updates totalPaid and recentPayments on the customer document
+// so the Customer Portal can show accurate balances and payment history securely
 async function updateCustomerTotalPaid(customerId) {
     const totalPaid = getCustomerTotalPaid(customerId);
+    const allPayments = getCustomerPayments(customerId); // already sorted by date desc
+    
+    // Store last 50 payments with only the fields the portal needs (keeps document size small)
+    const recentPayments = allPayments.slice(0, 50).map(p => ({
+        date: p.date,
+        amount: p.amount
+    }));
     
     if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbSaveCustomer === 'function') {
         const customers = getCustomers();
         const customer = customers.find(c => c.id === customerId);
         if (customer) {
             customer.totalPaid = totalPaid;
+            customer.recentPayments = recentPayments;
             await dbSaveCustomer(customer);
         }
     } else {
@@ -1194,6 +1203,7 @@ async function updateCustomerTotalPaid(customerId) {
         const customer = customers.find(c => c.id === customerId);
         if (customer) {
             customer.totalPaid = totalPaid;
+            customer.recentPayments = recentPayments;
             const idx = customers.findIndex(c => c.id === customerId);
             if (idx !== -1) customers[idx] = customer;
             saveCustomers(customers);
