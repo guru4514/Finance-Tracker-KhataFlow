@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Teams — Pigmie | Micro-Finance Team Management Software</title>
+    <meta name="description" content="Manage your entire collection team with Pigmie Organization Mode. Role-based access, approval workflows, agent performance tracking, and real-time sync.">
+    <link rel="canonical" href="https://pigmiecollection.in/teams.html">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-orb bg-orb-1"></div>
+
+    <nav class="navbar"><div class="nav-container"><a href="index.html" class="nav-logo"><div class="nav-logo-icon"><i class="ph-fill ph-wallet"></i></div>Pigmie</a><div class="nav-links"><a href="index.html">Home</a><a href="features.html">Features</a><a href="pricing.html">Pricing</a><a href="security.html">Security</a><a href="contact.html">Contact</a></div><div class="nav-actions"><a href="/app.html" class="btn btn-primary">Open App — Free</a></div><button class="mobile-menu-btn"><i class="ph ph-list"></i></button></div></nav>
+    <div class="mobile-nav"><a href="index.html">Home</a><a href="features.html">Features</a><a href="solo.html">For Solo Agents</a><a href="teams.html">For Teams</a><a href="pricing.html">Pricing</a><a href="security.html">Security</a><a href="contact.html">Contact</a></div>
+
+    <section class="page-hero">
+        <div class="container">
+            <div class="page-hero-content">
+                <div class="reveal">
+                    <div class="badge">Organization Mode</div>
+                    <h1>Manage your entire team <span class="text-gradient">from one dashboard.</span></h1>
+                    <p>Pigmie Organization Mode lets owners and admins manage multiple agents, approve transactions, track performance, and ensure accountability across the team.</p>
+                    <a href="/app.html" class="btn btn-primary btn-large">Create Organization — Free <i class="ph ph-arrow-right btn-icon"></i></a>
+                </div>
+                <div class="reveal delay-1" style="display: flex; justify-content: center;">
+                    <div class="phone-mockup">
+                        <div class="phone-mockup-notch"></div>
+                        <div class="phone-mockup-screen">
+                            <img src="assets/screenshots/reports.jpg" alt="Pigmie Reports Dashboard showing collection trends and team analytics">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Role Hierarchy -->
+    <section class="section" style="background: var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>5-Level <span class="text-gradient">role hierarchy</span></h2>
+                <p>Each role has carefully calibrated permissions. Agents can only see their own customers.</p>
+            </div>
+            <div class="role-hierarchy reveal">
+                <div class="card role-card-item">
+                    <i class="ph ph-crown"></i>
+                    <h4>Owner</h4>
+                    <p>Full control. Manages organization settings, members, and all data.</p>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="role-row">
+                    <div class="card role-card-item">
+                        <i class="ph ph-shield-star"></i>
+                        <h4>Admin</h4>
+                        <p>Approves agent actions. Manages customers and payments.</p>
+                    </div>
+                    <div class="card role-card-item">
+                        <i class="ph ph-user-gear"></i>
+                        <h4>Manager</h4>
+                        <p>Views all data. Can manage assigned agents and customers.</p>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="role-row">
+                    <div class="card role-card-item">
+                        <i class="ph ph-user"></i>
+                        <h4>Agent</h4>
+                        <p>Collects payments from assigned customers. Needs approval to save.</p>
+                    </div>
+                    <div class="card role-card-item">
+                        <i class="ph ph-eye"></i>
+                        <h4>Viewer</h4>
+                        <p>Read-only access. Can view data but cannot make any changes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Approval Flow -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Built-in <span class="text-gradient">approval workflow</span></h2>
+                <p>Every agent action is verified before it's recorded — preventing fraud.</p>
+            </div>
+            <div class="card approval-flow reveal" style="max-width: 800px; margin: 0 auto;">
+                <div class="flow-steps">
+                    <div class="flow-step">
+                        <div class="step-circle"><i class="ph ph-hand-coins"></i></div>
+                        <span>Agent Collects</span>
+                    </div>
+                    <div class="flow-line"></div>
+                    <div class="flow-step">
+                        <div class="step-circle pending"><i class="ph ph-hourglass"></i></div>
+                        <span>Request Pending</span>
+                    </div>
+                    <div class="flow-line"></div>
+                    <div class="flow-step">
+                        <div class="step-circle approved"><i class="ph ph-check"></i></div>
+                        <span>Admin Reviews</span>
+                    </div>
+                    <div class="flow-line"></div>
+                    <div class="flow-step">
+                        <div class="step-circle success"><i class="ph ph-database"></i></div>
+                        <span>Saved to Cloud</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Features -->
+    <section class="section" style="background: var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header reveal">
+                <h2>Team-specific <span class="text-gradient">features</span></h2>
+            </div>
+            <div class="features-grid" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="card card-glow feature-card reveal">
+                    <div class="feature-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);"><i class="ph ph-chart-bar"></i></div>
+                    <h3>Agent Performance Cards</h3>
+                    <p>See each agent's customer count, today's collection, this month's total, and defaulter count at a glance.</p>
+                </div>
+                <div class="card card-glow feature-card reveal delay-1">
+                    <div class="feature-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);"><i class="ph ph-bell-ringing"></i></div>
+                    <h3>Invite Code System</h3>
+                    <p>Share a unique code with agents. They enter it to request membership. Admins approve or reject.</p>
+                </div>
+                <div class="card card-glow feature-card reveal">
+                    <div class="feature-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);"><i class="ph ph-warning"></i></div>
+                    <h3>Defaulter Alerts</h3>
+                    <p>Auto-flag customers who haven't paid in 3+ days. Send reminders directly from the app.</p>
+                </div>
+                <div class="card card-glow feature-card reveal delay-1">
+                    <div class="feature-icon"><i class="ph ph-file-search"></i></div>
+                    <h3>Full Audit Trail</h3>
+                    <p>Every action is permanently logged: who did what, when, and from which device. Complete accountability.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container"><div class="cta-card reveal"><h2>Scale your collection team.</h2><p>Create your organization and invite agents — completely free.</p><div class="cta-buttons"><a href="/app.html" class="btn btn-primary btn-large"><i class="ph ph-browser btn-icon"></i> Create Organization — Free</a><a href="solo.html" class="btn btn-ghost btn-large">Solo agent? →</a></div></div></div>
+    </section>
+
+    <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand"><a href="index.html" class="nav-logo"><div class="nav-logo-icon"><i class="ph-fill ph-wallet"></i></div>Pigmie</a><p>Free pigmy & micro-finance collection management software.</p></div><div class="footer-col"><h4>Product</h4><a href="features.html">Features</a><a href="pricing.html">Pricing</a><a href="security.html">Security</a></div><div class="footer-col"><h4>Use Cases</h4><a href="solo.html">For Solo Agents</a><a href="teams.html">For Teams</a></div><div class="footer-col"><h4>Support</h4><a href="contact.html">Contact</a><a href="mailto:pigmiesoftware@gmail.com">Email Us</a></div></div><div class="footer-bottom"><p>&copy; 2026 Pigmie. All rights reserved.</p><a href="mailto:pigmiesoftware@gmail.com">pigmiesoftware@gmail.com</a></div></div></footer>
+    <script src="js/main.js"></script>
+</body>
+</html>

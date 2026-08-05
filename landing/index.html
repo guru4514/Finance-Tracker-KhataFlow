@@ -3,107 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance Tracker - Smart Pigmy & Micro-Finance Management</title>
-    <meta name="description" content="Secure, offline-first collection management software for micro-finance and pigmy agents. Track customers, daily collections, and approvals.">
-    
-    <!-- Fonts: Sora (Headings) and Inter (Body) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Icons (Phosphor Icons - clean and modern) -->
+    <title>Pigmie — Free Pigmy Collection App for Agents & Micro-Finance Teams</title>
+    <meta name="description" content="Free pigmy collection software for daily collection agents and micro-finance teams. Works offline, syncs to cloud. Manage customers, track payments, generate reports.">
+    <meta name="keywords" content="pigmy collection app, daily collection software, micro finance collection, pigmy agent app, free pigmy software, pigmy collection India">
+    <link rel="canonical" href="https://pigmiecollection.in/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pigmiecollection.in/">
+    <meta property="og:title" content="Pigmie — Free Pigmy Collection App">
+    <meta property="og:description" content="Free pigmy collection software for agents and micro-finance teams. Works offline. Manage customers, track payments, generate reports.">
+    <meta property="og:site_name" content="Pigmie">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Pigmie — Free Pigmy Collection App">
+    <meta name="twitter:description" content="Free pigmy collection software for agents and micro-finance teams. Works offline.">
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Organization",
+                "@id": "https://pigmiecollection.in/#organization",
+                "name": "Pigmie",
+                "url": "https://pigmiecollection.in",
+                "email": "pigmiesoftware@gmail.com"
+            },
+            {
+                "@type": "WebSite",
+                "@id": "https://pigmiecollection.in/#website",
+                "url": "https://pigmiecollection.in",
+                "name": "Pigmie",
+                "description": "Free pigmy collection app for agents and micro-finance teams in India.",
+                "publisher": { "@id": "https://pigmiecollection.in/#organization" },
+                "inLanguage": "en-IN"
+            },
+            {
+                "@type": "SoftwareApplication",
+                "name": "Pigmie",
+                "applicationCategory": "FinanceApplication",
+                "operatingSystem": "Android, Web",
+                "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+                "description": "Free daily pigmy collection management app with offline mode, cloud sync, customer portal, and team management."
+            }
+        ]
+    }
+    </script>
+
+    <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="landing.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/pages.css">
 </head>
 <body>
-    <!-- Background Effects -->
-    <div class="bg-effects">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-        <div class="grid-overlay"></div>
-    </div>
 
-    <!-- Navigation -->
+    <!-- Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+
+    <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="#" class="logo">
-                <i class="ph-fill ph-wallet"></i>
-                Finance Tracker
+            <a href="index.html" class="nav-logo">
+                <div class="nav-logo-icon"><i class="ph-fill ph-wallet"></i></div>
+                Pigmie
             </a>
             <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#how-it-works">How It Works</a>
-                <a href="#security">Security</a>
-                <a href="#faq">FAQ</a>
+                <a href="index.html" class="active">Home</a>
+                <a href="features.html">Features</a>
+                <a href="pricing.html">Pricing</a>
+                <a href="security.html">Security</a>
+                <a href="contact.html">Contact</a>
             </div>
             <div class="nav-actions">
                 <a href="/app.html" class="btn btn-outline">Log In</a>
-                <a href="/app.html" class="btn btn-primary">Get Started</a>
+                <a href="/app.html" class="btn btn-primary">Open App — Free</a>
             </div>
-            <button class="mobile-menu-btn">
-                <i class="ph ph-list"></i>
-            </button>
+            <button class="mobile-menu-btn"><i class="ph ph-list"></i></button>
         </div>
     </nav>
 
-    <!-- 1. Hero Section -->
+    <!-- Mobile Nav -->
+    <div class="mobile-nav">
+        <a href="index.html">Home</a>
+        <a href="features.html">Features</a>
+        <a href="solo.html">For Solo Agents</a>
+        <a href="teams.html">For Teams</a>
+        <a href="portal.html">Customer Portal</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="security.html">Security</a>
+        <a href="contact.html">Contact</a>
+        <a href="/app.html" class="btn btn-primary" style="text-align:center; margin-top: 8px;">Open App — Free</a>
+    </div>
+
+    <!-- ===== 1. HERO ===== -->
     <header class="hero">
         <div class="container hero-content">
             <div class="hero-text reveal">
-                <div class="badge">Version 1.0 Available Now</div>
-                <h1>Smart Pigmy & <span class="text-gradient">Micro-Finance</span> Management</h1>
-                <p>The ultimate offline-first tool for collection agents. Track customers, record daily payments, and sync securely to the cloud when you're back online.</p>
+                <div class="badge badge-success">🆓 Free Forever — No Hidden Charges</div>
+                <h1>Ditch the paper register. <span class="text-gradient">Collect digitally.</span></h1>
+                <p>The free collection management app built for pigmy agents and micro-finance teams in India. Works offline. Syncs to cloud. Know who paid today — in 2 seconds.</p>
                 <div class="hero-buttons">
-                    <a href="/app.html" class="btn btn-primary btn-large">Launch App <i class="ph ph-arrow-right"></i></a>
-                    <a href="#features" class="btn btn-glass btn-large">Explore Features</a>
+                    <a href="/app.html" class="btn btn-primary btn-large">
+                        Open App — Free <i class="ph ph-arrow-right btn-icon"></i>
+                    </a>
+                    <a href="features.html" class="btn btn-ghost btn-large">
+                        See All Features
+                    </a>
                 </div>
             </div>
             <div class="hero-visual reveal delay-1">
-                <div class="glass-panel app-mockup">
-                    <div class="mockup-header">
-                        <div class="dots"><span></span><span></span><span></span></div>
-                        <div class="url-bar">app.financetracker.com</div>
-                    </div>
-                    <div class="mockup-body">
-                        <!-- Mockup representation of the dashboard -->
-                        <div class="mock-dash">
-                            <div class="mock-stat">
-                                <span>Total Capital</span>
-                                <h4>₹45,200</h4>
-                            </div>
-                            <div class="mock-stat">
-                                <span>Today's Collection</span>
-                                <h4>₹3,850</h4>
-                            </div>
+                <div class="hero-phones">
+                    <div class="phone-mockup">
+                        <div class="phone-mockup-notch"></div>
+                        <div class="phone-mockup-screen">
+                            <img src="assets/screenshots/reports.jpg" alt="Pigmie Reports Dashboard showing collection trends and defaulters list">
                         </div>
-                        <div class="mock-list">
-                            <div class="mock-item">
-                                <div class="mock-avatar"></div>
-                                <div class="mock-info">
-                                    <strong>Rahul Sharma</strong>
-                                    <span>Pigmy - ₹100/day</span>
-                                </div>
-                                <div class="mock-status success">Collected</div>
-                            </div>
-                            <div class="mock-item">
-                                <div class="mock-avatar"></div>
-                                <div class="mock-info">
-                                    <strong>Anita Desai</strong>
-                                    <span>Micro Loan - ₹500/day</span>
-                                </div>
-                                <div class="mock-status pending">Pending</div>
-                            </div>
-                            <div class="mock-item">
-                                <div class="mock-avatar"></div>
-                                <div class="mock-info">
-                                    <strong>Vikram Singh</strong>
-                                    <span>Pigmy - ₹200/day</span>
-                                </div>
-                                <div class="mock-status pending">Pending</div>
-                            </div>
+                    </div>
+                    <div class="phone-mockup">
+                        <div class="phone-mockup-notch"></div>
+                        <div class="phone-mockup-screen">
+                            <img src="assets/screenshots/customers.jpg" alt="Pigmie Customer List showing loan details and collection progress">
                         </div>
                     </div>
                 </div>
@@ -111,290 +138,167 @@
         </div>
     </header>
 
-    <!-- 2. Features Section -->
-    <section id="features" class="features section">
+    <!-- ===== 2. TRUST BAR ===== -->
+    <section class="trust-bar">
+        <div class="container">
+            <div class="trust-items reveal">
+                <div class="trust-item"><span class="icon">🆓</span> Free Forever</div>
+                <div class="trust-item"><span class="icon">📴</span> Works Offline</div>
+                <div class="trust-item"><span class="icon">🔒</span> Bank-Grade Security</div>
+                <div class="trust-item"><span class="icon">🇮🇳</span> Made for India</div>
+                <div class="trust-item"><span class="icon">🌐</span> Multi-Language</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 3. KEY FEATURES ===== -->
+    <section id="features" class="section">
         <div class="container">
             <div class="section-header reveal">
                 <h2>Everything you need to <span class="text-gradient">manage collections</span></h2>
                 <p>Built specifically for the unique needs of pigmy agents and micro-finance teams.</p>
             </div>
-            
+
             <div class="features-grid">
-                <div class="glass-card feature-card reveal">
-                    <div class="feature-icon"><i class="ph ph-lightning"></i></div>
-                    <h3>Smart Prompts & Split Collections</h3>
-                    <p>Auto-calculate collection splits between Principal and Interest with intelligent daily repayment suggestions.</p>
-                </div>
-                
-                <div class="glass-card feature-card reveal delay-1">
-                    <div class="feature-icon"><i class="ph ph-qr-code"></i></div>
-                    <h3>Customer Passbook Portal</h3>
-                    <p>Give customers zero-login access to view their live repayment passbook instantly using their unique Customer ID.</p>
-                </div>
-                
-                <div class="glass-card feature-card reveal delay-2">
-                    <div class="feature-icon"><i class="ph ph-shield-check"></i></div>
-                    <h3>Server-Validated Security</h3>
-                    <p>Hardened Firestore Security Rules prevent unauthorized reads and enforce strict schema validation for all transactions.</p>
-                </div>
-                
-                <div class="glass-card feature-card reveal delay-3">
+                <div class="card card-glow feature-card reveal">
                     <div class="feature-icon"><i class="ph ph-wifi-slash"></i></div>
-                    <h3>Offline-First Personal Mode</h3>
-                    <p>Work seamlessly without internet. Data is cached locally in IndexedDB and syncs to the cloud automatically when online.</p>
+                    <h3>Offline-First Mode</h3>
+                    <p>Collect all day without internet. Data is saved locally and syncs to the cloud when you're back online.</p>
                 </div>
-                
-                <div class="glass-card feature-card reveal">
-                    <div class="feature-icon"><i class="ph ph-cloud-arrow-up"></i></div>
-                    <h3>Real-Time Org Mode</h3>
-                    <p>Manage collection agents with live cloud synchronization. See daily collections update in real time across your organization.</p>
-                </div>
-                
-                <div class="glass-card feature-card reveal delay-1">
+                <div class="card card-glow feature-card reveal delay-1">
                     <div class="feature-icon"><i class="ph ph-users-three"></i></div>
-                    <h3>Role-Based Access (RBAC)</h3>
-                    <p>Assign specific roles: Owner, Admin, Manager, Agent, and Viewer to enforce strict least-privilege permissions.</p>
+                    <h3>Team Management</h3>
+                    <p>Manage multiple agents with role-based access. Owners, Admins, Managers, Agents, and Viewers.</p>
                 </div>
-                
-                <div class="glass-card feature-card reveal delay-2">
+                <div class="card card-glow feature-card reveal delay-2">
+                    <div class="feature-icon"><i class="ph ph-qr-code"></i></div>
+                    <h3>Customer Portal</h3>
+                    <p>Customers can self-check their balance and payment history. Zero login needed. Builds trust.</p>
+                </div>
+                <div class="card card-glow feature-card reveal">
                     <div class="feature-icon"><i class="ph ph-check-square-offset"></i></div>
                     <h3>Approval Workflows</h3>
-                    <p>Agents submit collection requests for Admin approval, preventing fraud and accidental record modifications.</p>
+                    <p>Agents submit collections for admin approval. Prevents fraud and accidental record modifications.</p>
                 </div>
-                
-                <div class="glass-card feature-card reveal delay-3">
-                    <div class="feature-icon"><i class="ph ph-file-search"></i></div>
-                    <h3>Comprehensive Audit Log</h3>
-                    <p>Every customer addition, payment edit, and loan closure is permanently logged for full accountability.</p>
+                <div class="card card-glow feature-card reveal delay-1">
+                    <div class="feature-icon"><i class="ph ph-chart-line-up"></i></div>
+                    <h3>Reports & Analytics</h3>
+                    <p>Collection trends, defaulter lists, agent performance cards — all auto-generated from your data.</p>
                 </div>
+                <div class="card card-glow feature-card reveal delay-2">
+                    <div class="feature-icon"><i class="ph ph-translate"></i></div>
+                    <h3>Multi-Language</h3>
+                    <p>Use the app in English, Kannada, or Hindi. Perfect for field agents across India.</p>
+                </div>
+            </div>
 
-                <div class="glass-card feature-card reveal">
-                    <div class="feature-icon"><i class="ph ph-device-mobile"></i></div>
-                    <h3>Native Android & PWA App</h3>
-                    <p>Run natively on Android devices via Capacitor or install as a Progressive Web App directly to your home screen.</p>
-                </div>
+            <div style="text-align: center; margin-top: var(--space-xl);">
+                <a href="features.html" class="btn btn-outline">See All 12 Features <i class="ph ph-arrow-right btn-icon"></i></a>
             </div>
         </div>
     </section>
 
-    <!-- 3. Comparison Section -->
-    <section class="comparison section">
+    <!-- ===== 4. COMPARISON ===== -->
+    <section class="section" style="background: var(--bg-secondary);">
         <div class="container">
             <div class="section-header reveal">
-                <h2>Why switch to <span class="text-gradient">Finance Tracker?</span></h2>
+                <h2>Why switch to <span class="text-gradient">Pigmie?</span></h2>
             </div>
-            
-            <div class="comparison-container reveal">
-                <div class="glass-card compare-col manual">
+
+            <div class="comparison-grid reveal">
+                <div class="card compare-col">
                     <div class="col-header">
-                        <i class="ph ph-notebook text-accent"></i>
+                        <i class="ph ph-notebook" style="color: var(--warning);"></i>
                         <h3>Pen & Paper</h3>
                     </div>
                     <ul class="compare-list">
-                        <li><i class="ph-fill ph-x-circle text-accent"></i> Physical books get lost or damaged</li>
-                        <li><i class="ph-fill ph-x-circle text-accent"></i> Hard to identify daily defaulters</li>
-                        <li><i class="ph-fill ph-x-circle text-accent"></i> Agents can manipulate entries</li>
-                        <li><i class="ph-fill ph-x-circle text-accent"></i> Hours spent calculating totals</li>
-                        <li><i class="ph-fill ph-x-circle text-accent"></i> Difficult to manage multiple agents</li>
+                        <li><i class="ph-fill ph-x-circle" style="color: var(--danger);"></i> Physical books get lost or damaged</li>
+                        <li><i class="ph-fill ph-x-circle" style="color: var(--danger);"></i> Hard to identify daily defaulters</li>
+                        <li><i class="ph-fill ph-x-circle" style="color: var(--danger);"></i> Agents can manipulate entries</li>
+                        <li><i class="ph-fill ph-x-circle" style="color: var(--danger);"></i> Hours spent calculating totals</li>
+                        <li><i class="ph-fill ph-x-circle" style="color: var(--danger);"></i> Customers can't verify payments</li>
                     </ul>
                 </div>
-                
+
                 <div class="vs-badge">VS</div>
-                
-                <div class="glass-card compare-col tracker highlight">
+
+                <div class="card compare-col highlight">
                     <div class="col-header">
-                        <i class="ph ph-rocket-launch text-primary"></i>
-                        <h3>Finance Tracker</h3>
+                        <i class="ph ph-rocket-launch" style="color: var(--primary-light);"></i>
+                        <h3>Pigmie</h3>
                     </div>
                     <ul class="compare-list">
-                        <li><i class="ph-fill ph-check-circle text-primary"></i> Data securely backed up in the cloud</li>
-                        <li><i class="ph-fill ph-check-circle text-primary"></i> Instant defaulter alerts and lists</li>
-                        <li><i class="ph-fill ph-check-circle text-primary"></i> Approval workflow prevents fraud</li>
-                        <li><i class="ph-fill ph-check-circle text-primary"></i> Automatic dashboard with live totals</li>
-                        <li><i class="ph-fill ph-check-circle text-primary"></i> Full team management with permissions</li>
+                        <li><i class="ph-fill ph-check-circle" style="color: var(--success);"></i> Data securely backed up in the cloud</li>
+                        <li><i class="ph-fill ph-check-circle" style="color: var(--success);"></i> Instant defaulter alerts and lists</li>
+                        <li><i class="ph-fill ph-check-circle" style="color: var(--success);"></i> Approval workflow prevents fraud</li>
+                        <li><i class="ph-fill ph-check-circle" style="color: var(--success);"></i> Automatic dashboard with live totals</li>
+                        <li><i class="ph-fill ph-check-circle" style="color: var(--success);"></i> Customer Portal for self-service</li>
                     </ul>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 4. How It Works -->
-    <section id="how-it-works" class="how-it-works section">
+    <!-- ===== 5. HOW IT WORKS ===== -->
+    <section id="how-it-works" class="section">
         <div class="container">
             <div class="section-header reveal">
                 <h2>How <span class="text-gradient">it works</span></h2>
                 <p>Get up and running with digital collections in minutes.</p>
             </div>
-            
-            <div class="steps-container">
-                <div class="step-card reveal">
+
+            <div class="steps-row reveal">
+                <div class="step-card">
                     <div class="step-number">1</div>
-                    <div class="glass-card">
-                        <div class="step-icon"><i class="ph ph-user-plus"></i></div>
-                        <h3>Sign Up</h3>
-                        <p>Create your free account instantly. No credit card required.</p>
-                    </div>
+                    <div class="step-icon"><i class="ph ph-user-plus"></i></div>
+                    <h3>Sign Up Free</h3>
+                    <p>Create your account in seconds. No credit card. No demo calls.</p>
                 </div>
-                
-                <div class="step-connector reveal"><i class="ph ph-caret-right"></i></div>
-                
-                <div class="step-card reveal delay-1">
+                <div class="step-card">
                     <div class="step-number">2</div>
-                    <div class="glass-card">
-                        <div class="step-icon"><i class="ph ph-sliders"></i></div>
-                        <h3>Choose Mode</h3>
-                        <p>Select Personal Mode for solo use, or Organization Mode for teams.</p>
-                    </div>
+                    <div class="step-icon"><i class="ph ph-sliders"></i></div>
+                    <h3>Choose Mode</h3>
+                    <p>Personal Mode for solo agents. Organization Mode for teams.</p>
                 </div>
-                
-                <div class="step-connector reveal delay-1"><i class="ph ph-caret-right"></i></div>
-                
-                <div class="step-card reveal delay-2">
+                <div class="step-card">
                     <div class="step-number">3</div>
-                    <div class="glass-card">
-                        <div class="step-icon"><i class="ph ph-users"></i></div>
-                        <h3>Add Customers</h3>
-                        <p>Register your customers, set their daily targets, and you're ready.</p>
-                    </div>
+                    <div class="step-icon"><i class="ph ph-users"></i></div>
+                    <h3>Add Customers</h3>
+                    <p>Register customers with loan amounts, daily targets, and deadlines.</p>
                 </div>
-                
-                <div class="step-connector reveal delay-2"><i class="ph ph-caret-right"></i></div>
-                
-                <div class="step-card reveal delay-3">
+                <div class="step-card">
                     <div class="step-number">4</div>
-                    <div class="glass-card">
-                        <div class="step-icon"><i class="ph ph-hand-coins"></i></div>
-                        <h3>Collect</h3>
-                        <p>Log daily payments with a single tap. Syncs instantly or when online.</p>
-                    </div>
+                    <div class="step-icon"><i class="ph ph-hand-coins"></i></div>
+                    <h3>Start Collecting</h3>
+                    <p>Log payments with one tap. Syncs instantly or when online.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 5. Organization Mode Showcase -->
-    <section id="org-mode" class="org-showcase section">
+    <!-- ===== 6. APP SHOWCASE ===== -->
+    <section class="section" style="background: var(--bg-secondary);">
         <div class="container">
-            <div class="section-header reveal">
-                <h2>Powerful <span class="text-gradient">Team Management</span></h2>
-                <p>Built for micro-finance agencies. Manage multiple collection agents with strict role-based access and approval workflows.</p>
-            </div>
-            
-            <div class="org-hierarchy reveal">
-                <div class="role-card owner">
-                    <i class="ph ph-crown"></i>
-                    <h4>Owner / Admin</h4>
-                    <p>Full control over the organization, approvals, and member management.</p>
-                </div>
-                
-                <div class="flow-arrow"><i class="ph ph-arrow-down"></i></div>
-                
-                <div class="role-row">
-                    <div class="role-card manager">
-                        <i class="ph ph-briefcase"></i>
-                        <h4>Manager</h4>
-                        <p>Oversees agents and views organization-wide reports.</p>
-                    </div>
-                    <div class="role-card viewer">
-                        <i class="ph ph-eye"></i>
-                        <h4>Viewer</h4>
-                        <p>Read-only access for auditing purposes.</p>
-                    </div>
-                </div>
-                
-                <div class="flow-arrow"><i class="ph ph-arrow-down"></i></div>
-                
-                <div class="role-card agent">
-                    <i class="ph ph-user"></i>
-                    <h4>Collection Agent</h4>
-                    <p>Can only view assigned customers and submit daily collections.</p>
-                </div>
-            </div>
-            
-            <div class="approval-flow glass-card reveal delay-1 mt-4">
-                <div class="flow-title">
-                    <i class="ph ph-shield-check text-secondary"></i>
-                    <h3>Secure Approval Workflow</h3>
-                </div>
-                <div class="flow-steps">
-                    <div class="flow-step">
-                        <div class="step-circle"><i class="ph ph-hand-coins"></i></div>
-                        <span>Agent collects ₹500</span>
-                    </div>
-                    <div class="flow-line"></div>
-                    <div class="flow-step">
-                        <div class="step-circle pending"><i class="ph ph-hourglass-high"></i></div>
-                        <span>Request Pending</span>
-                    </div>
-                    <div class="flow-line"></div>
-                    <div class="flow-step">
-                        <div class="step-circle approved"><i class="ph ph-check"></i></div>
-                        <span>Admin Approves</span>
-                    </div>
-                    <div class="flow-line"></div>
-                    <div class="flow-step">
-                        <div class="step-circle success"><i class="ph ph-database"></i></div>
-                        <span>Saved to Cloud</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 6. App Showcase -->
-    <section class="showcase section">
-        <div class="container">
-            <div class="showcase-content reveal">
-                <div class="showcase-text">
+            <div class="showcase-content">
+                <div class="showcase-text reveal">
                     <h2>Beautifully designed for <span class="text-gradient">mobile</span></h2>
-                    <p>Finance Tracker is built as a Progressive Web App and wrapped with Capacitor, giving you a flawless native Android experience on your phone, while still accessible from any web browser.</p>
-                    <ul class="feature-list">
-                        <li><i class="ph ph-check text-primary"></i> Responsive layout fits any screen size</li>
-                        <li><i class="ph ph-check text-primary"></i> Install directly to your homescreen</li>
-                        <li><i class="ph ph-check text-primary"></i> Fast, app-like performance</li>
+                    <p>Pigmie is built as a Progressive Web App and wrapped with Capacitor for a native Android experience. Your daily collections feel fast and intuitive.</p>
+                    <ul class="showcase-list">
+                        <li><i class="ph-fill ph-check-circle"></i> Responsive layout fits any screen size</li>
+                        <li><i class="ph-fill ph-check-circle"></i> Install directly to your homescreen</li>
+                        <li><i class="ph-fill ph-check-circle"></i> Dark theme — easy on the eyes in the field</li>
+                        <li><i class="ph-fill ph-check-circle"></i> Works on budget Android phones</li>
                     </ul>
-                    <a href="#download" class="btn btn-outline mt-4">Download Android App</a>
-                </div>
-                <div class="showcase-images">
-                    <!-- CSS drawn phone frames instead of real images for the mockup -->
-                    <div class="phone-frame front">
-                        <div class="phone-notch"></div>
-                        <div class="phone-screen">
-                            <div class="s-header">Dashboard</div>
-                            <div class="s-card dark">₹45,200<br><span>Total Capital</span></div>
-                            <div class="s-card light">₹3,850<br><span>Today's Collection</span></div>
-                            <div class="s-list">
-                                <div class="s-list-item"></div>
-                                <div class="s-list-item"></div>
-                                <div class="s-list-item"></div>
-                            </div>
-                            <div class="s-nav">
-                                <span></span><span class="active"></span><span></span>
-                            </div>
-                        </div>
+                    <div style="margin-top: var(--space-xl);">
+                        <a href="solo.html" class="btn btn-outline">For Solo Agents →</a>
+                        <a href="teams.html" class="btn btn-outline" style="margin-left: var(--space-md);">For Teams →</a>
                     </div>
-                    <div class="phone-frame back">
-                        <div class="phone-notch"></div>
-                        <div class="phone-screen org-view">
-                            <div class="s-header">Pending Approvals</div>
-                            <div class="s-list mt-2">
-                                <div class="s-approval-card">
-                                    <div class="s-row">Agent Ram</div>
-                                    <div class="s-row bold">Collected ₹200</div>
-                                    <div class="s-actions">
-                                        <div class="s-btn red"></div>
-                                        <div class="s-btn green"></div>
-                                    </div>
-                                </div>
-                                <div class="s-approval-card">
-                                    <div class="s-row">Agent Shyam</div>
-                                    <div class="s-row bold">Collected ₹500</div>
-                                    <div class="s-actions">
-                                        <div class="s-btn red"></div>
-                                        <div class="s-btn green"></div>
-                                    </div>
-                                </div>
-                            </div>
+                </div>
+                <div class="showcase-phones reveal delay-1">
+                    <div class="phone-mockup">
+                        <div class="phone-mockup-notch"></div>
+                        <div class="phone-mockup-screen">
+                            <img src="assets/screenshots/customers.jpg" alt="Pigmie Customer Management showing loan details and collection tracking">
                         </div>
                     </div>
                 </div>
@@ -402,146 +306,61 @@
         </div>
     </section>
 
-    <!-- 6. Security Section -->
-    <section id="security" class="security section">
+    <!-- ===== 7. CTA ===== -->
+    <section class="cta-section">
         <div class="container">
-            <div class="section-header reveal">
-                <h2>Bank-grade <span class="text-gradient">Security & Privacy</span></h2>
-                <p>Your financial data is sensitive. We protect it with industry-leading security practices.</p>
-            </div>
-            
-            <div class="security-grid">
-                <div class="glass-card reveal">
-                    <i class="ph ph-lock-key text-secondary"></i>
-                    <h3>Encrypted Data</h3>
-                    <p>Powered by Firebase, all your data is encrypted both in transit and at rest on Google's secure servers.</p>
-                </div>
-                
-                <div class="glass-card reveal delay-1">
-                    <i class="ph ph-device-tablet text-secondary"></i>
-                    <h3>Local First</h3>
-                    <p>In Personal Mode, your data never leaves your device unless you explicitly hit the Sync button.</p>
-                </div>
-                
-                <div class="glass-card reveal delay-2">
-                    <i class="ph ph-shield-check text-secondary"></i>
-                    <h3>Strict Permissions</h3>
-                    <p>Agents can only see their assigned customers. They cannot view the organization's total capital or other agents' data.</p>
+            <div class="cta-card reveal">
+                <h2>Ready to go digital?</h2>
+                <p>Join agents across India who have switched from paper registers to Pigmie. It's free — forever.</p>
+                <div class="cta-buttons">
+                    <a href="/app.html" class="btn btn-primary btn-large">
+                        <i class="ph ph-browser btn-icon"></i> Open Web App
+                    </a>
+                    <a href="contact.html" class="btn btn-ghost btn-large">
+                        <i class="ph ph-envelope btn-icon"></i> Contact Us
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 7. Download Section -->
-    <section id="download" class="download section">
-        <div class="container">
-            <div class="glass-panel download-cta reveal">
-                <div class="cta-content">
-                    <h2>Ready to organize your collections?</h2>
-                    <p>Join micro-finance managers who have switched from paper to Finance Tracker.</p>
-                    <div class="cta-buttons">
-                        <a href="/app.html" class="btn btn-primary btn-large">
-                            <i class="ph ph-browser"></i> Open Web App
-                        </a>
-                        <a href="#" class="btn btn-glass btn-large">
-                            <i class="ph ph-android-logo"></i> Download APK
-                        </a>
-                    </div>
-                </div>
-                <div class="cta-qrcode">
-                    <div class="qr-placeholder">
-                        <i class="ph ph-qr-code"></i>
-                        <span>Scan to open<br>on mobile</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 8. FAQ Section -->
-    <section id="faq" class="faq section">
-        <div class="container">
-            <div class="section-header reveal">
-                <h2>Frequently Asked <span class="text-gradient">Questions</span></h2>
-            </div>
-            
-            <div class="faq-accordion reveal">
-                <div class="glass-card faq-item">
-                    <div class="faq-question">
-                        <h3>Is my data safe?</h3>
-                        <i class="ph ph-caret-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Yes. We use Google Firebase for authentication and database management. Your data is encrypted and securely stored. In Organization Mode, strict Role-Based Access ensures agents cannot modify records without admin approval.</p>
-                    </div>
-                </div>
-                
-                <div class="glass-card faq-item">
-                    <div class="faq-question">
-                        <h3>Can I use it offline?</h3>
-                        <i class="ph ph-caret-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Yes! In Personal Mode, Finance Tracker works entirely offline using IndexedDB on your device. You can log all your collections throughout the day without internet, and sync to the cloud when you return home.</p>
-                    </div>
-                </div>
-                
-                <div class="glass-card faq-item">
-                    <div class="faq-question">
-                        <h3>How do I invite agents to my organization?</h3>
-                        <i class="ph ph-caret-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>The Owner or Admin creates an organization and generates a unique Invite Code. Agents download the app, enter the code, and their join request appears in the Admin's Pending Approvals dashboard.</p>
-                    </div>
-                </div>
-                
-                <div class="glass-card faq-item">
-                    <div class="faq-question">
-                        <h3>Is Finance Tracker free?</h3>
-                        <i class="ph ph-caret-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Currently, yes. Finance Tracker is completely free to use for both Personal and Organization modes while in active development.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 9. Footer -->
+    <!-- ===== FOOTER ===== -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-top">
+            <div class="footer-grid">
                 <div class="footer-brand">
-                    <a href="#" class="logo">
-                        <i class="ph-fill ph-wallet text-primary"></i>
-                        Finance Tracker
+                    <a href="index.html" class="nav-logo">
+                        <div class="nav-logo-icon"><i class="ph-fill ph-wallet"></i></div>
+                        Pigmie
                     </a>
-                    <p>Smart Pigmy & Micro-Finance Collection Management.</p>
+                    <p>Free pigmy & micro-finance collection management software. Built for Indian agents and teams.</p>
                 </div>
-                <div class="footer-links">
-                    <div class="link-group">
-                        <h4>Product</h4>
-                        <a href="#features">Features</a>
-                        <a href="#security">Security</a>
-                        <a href="#download">Download App</a>
-                    </div>
-                    <div class="link-group">
-                        <h4>Resources</h4>
-                        <a href="#how-it-works">How it works</a>
-                        <a href="#faq">FAQ</a>
-                        <a href="mailto:gurubk321@gmail.com">Contact Support</a>
-                    </div>
+                <div class="footer-col">
+                    <h4>Product</h4>
+                    <a href="features.html">Features</a>
+                    <a href="pricing.html">Pricing</a>
+                    <a href="security.html">Security</a>
+                    <a href="portal.html">Customer Portal</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Use Cases</h4>
+                    <a href="solo.html">For Solo Agents</a>
+                    <a href="teams.html">For Teams</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <a href="contact.html">Contact</a>
+                    <a href="mailto:pigmiesoftware@gmail.com">Email Us</a>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 Finance Tracker. All rights reserved.</p>
+                <p>&copy; 2026 Pigmie. All rights reserved.</p>
+                <a href="mailto:pigmiesoftware@gmail.com">pigmiesoftware@gmail.com</a>
             </div>
         </div>
     </footer>
 
     <!-- Scripts -->
-    <script src="landing.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
