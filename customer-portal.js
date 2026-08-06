@@ -37,9 +37,15 @@ function resetCustomerPortal() {
 async function trackCustomerPassbook() {
     const orgIdInput = document.getElementById('trackOrgId').value.trim();
     const customerIdInput = document.getElementById('trackCustomerId').value.trim();
+    const pinInput = document.getElementById('trackCustomerPin') ? document.getElementById('trackCustomerPin').value.trim() : '';
     
     if (!orgIdInput || !customerIdInput) {
         if (typeof showToast === 'function') showToast('Please enter both Organization ID and Customer ID', 'error');
+        return;
+    }
+
+    if (!pinInput || pinInput.length !== 4 || !/^\d{4}$/.test(pinInput)) {
+        if (typeof showToast === 'function') showToast('Please enter a valid 4-digit PIN', 'error');
         return;
     }
 
@@ -67,8 +73,22 @@ async function trackCustomerPassbook() {
 
         const customer = customerDoc.data();
 
-        // Use totalPaid stored on the customer document (updated whenever a payment is recorded)
-        // This is secure because we only need a single 'get' on the customer doc, no payment list query needed
+        // Validate PIN — compare against stored portalPin field
+        if (!customer.portalPin) {
+            if (typeof showToast === 'function') showToast('Portal access not enabled for this customer. Ask your agent to set a PIN.', 'error');
+            btn.innerText = originalText;
+            btn.disabled = false;
+            return;
+        }
+
+        if (String(customer.portalPin) !== pinInput) {
+            if (typeof showToast === 'function') showToast('Incorrect PIN. Please try again.', 'error');
+            btn.innerText = originalText;
+            btn.disabled = false;
+            return;
+        }
+
+        // PIN verified — render the passbook
         renderCustomerPassbook(customer);
 
         // Switch UI

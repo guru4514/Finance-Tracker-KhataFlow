@@ -11,10 +11,10 @@
 function escapeHTML(str) {
     if (typeof str !== 'string') return str;
     return str.replace(/&/g, '&amp;')
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/"/g, '&quot;')
-              .replace(/'/g, '&#039;');
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 const STORAGE_KEYS = {
     CUSTOMERS: 'pigmie_customers',
@@ -1095,7 +1095,7 @@ function getCustomers() {
 
 function saveCustomers(customers) {
     _customersCache = customers;
-    
+
     // Only persist to IndexedDB in personal mode. 
     // In org mode, dbSaveCustomer handles Firestore writes directly.
     if (typeof appMode === 'undefined' || appMode !== 'org') {
@@ -1110,7 +1110,7 @@ function getPayments() {
 
 function savePayments(payments) {
     _paymentsCache = payments;
-    
+
     // Only persist to IndexedDB in personal mode.
     if (typeof appMode === 'undefined' || appMode !== 'org') {
         if (typeof saveToDB === 'function') saveToDB('payments', payments);
@@ -1183,13 +1183,13 @@ function getCustomerPayments(customerId) {
 async function updateCustomerTotalPaid(customerId) {
     const totalPaid = getCustomerTotalPaid(customerId);
     const allPayments = getCustomerPayments(customerId); // already sorted by date desc
-    
+
     // Store last 50 payments with only the fields the portal needs (keeps document size small)
     const recentPayments = allPayments.slice(0, 50).map(p => ({
         date: p.date,
         amount: p.amount
     }));
-    
+
     if (typeof appMode !== 'undefined' && appMode === 'org' && typeof dbSaveCustomer === 'function') {
         const customers = getCustomers();
         const customer = customers.find(c => c.id === customerId);
@@ -1424,7 +1424,7 @@ function refreshDashboard() {
     document.getElementById('statTotalCollected').textContent = formatCurrency(totalCollected);
     document.getElementById('statPendingAmount').textContent = formatCurrency(Math.max(0, pendingAmount));
     document.getElementById('statTodayCollection').textContent = formatCurrency(todayCollection);
-    
+
     if (document.getElementById('statTodayLoans')) {
         document.getElementById('statTodayLoans').textContent = formatCurrency(todayLoans);
     }
@@ -1796,11 +1796,22 @@ function openCustomerModal(customerId = null) {
                 document.getElementById('idProofPreviewImg').style.display = 'block';
                 document.getElementById('idProofText').style.display = 'none';
             }
+            // Load portal PIN if exists
+            const pinInput = document.getElementById('portalPin');
+            if (pinInput) pinInput.value = customer.portalPin || '';
         }
     } else {
         title.textContent = t('addNewCustomer');
         saveBtn.textContent = t('btnSaveCustomer');
         document.getElementById('interestRate').value = 0;
+        const pinInput = document.getElementById('portalPin');
+        if (pinInput) pinInput.value = '';
+    }
+
+    // Show portal PIN field only in org mode
+    const portalPinGroup = document.getElementById('portalPinGroup');
+    if (portalPinGroup) {
+        portalPinGroup.style.display = (typeof appMode !== 'undefined' && appMode === 'org') ? 'block' : 'none';
     }
 
     updateCustomerAmountLabel();
@@ -1912,8 +1923,18 @@ async function saveCustomer(event) {
                 customerObj.assignedAgentName = currentUser.displayName || currentUser.email;
             }
         }
+
+        // Save portal PIN if provided (org mode only)
+        const portalPinEl = document.getElementById('portalPin');
+        if (portalPinEl && portalPinEl.value.trim()) {
+            const pin = portalPinEl.value.trim();
+            if (/^\d{4}$/.test(pin)) {
+                customerObj.portalPin = pin;
+            }
+        }
+
         const action = id ? 'EDIT_CUSTOMER' : 'ADD_CUSTOMER';
-        
+
         if (!canPerform(action)) {
             showToast(typeof t === 'function' ? t('noPermission') || 'You do not have permission' : 'You do not have permission', 'error');
             return;
@@ -2305,12 +2326,12 @@ async function renewLoan(customerId) {
         const originalStart = new Date(customer.issuedDate);
         const originalEnd = new Date(customer.deadline);
         const durationDays = Math.round((originalEnd - originalStart) / (1000 * 60 * 60 * 24));
-        
+
         // Reset to active with today's date
         customer.status = 'active';
         customer.issuedDate = getTodayStr();
         customer.closedDate = '';
-        
+
         // Set deadline to same duration from today
         const newDeadline = new Date();
         newDeadline.setDate(newDeadline.getDate() + Math.max(durationDays, 30));
@@ -2558,7 +2579,7 @@ async function submitDailyEntry(customerId) {
         const customerPayments = getPayments().filter(p => p.customerId === customerId);
         const totalPaid = customerPayments.reduce((sum, p) => sum + p.amount, 0);
         const totalRepayable = calculateTotalRepayable(customer);
-        
+
         if (totalPaid >= totalRepayable) {
             setTimeout(async () => {
                 const closeConfirmed = await showConfirm(`This payment fully clears the loan balance for ${getDisplayName(customer)}! Would you like to mark this loan as Closed?`);
@@ -4310,11 +4331,11 @@ function selectInitialMode(mode, role = null) {
     } else {
         localStorage.removeItem('pigmie_initial_role');
     }
-    
+
     // Hide onboarding
     const onboardingUI = document.getElementById('onboardingUI');
     if (onboardingUI) onboardingUI.style.display = 'none';
-    
+
     // If the user is already logged into Firebase, directly enter app mode
     if (window.currentUser || (window.firebase && firebase.auth().currentUser)) {
         if (typeof selectAppMode === 'function') {
@@ -4343,7 +4364,7 @@ function submitInitialJoinRequest() {
         showToast('Please enter an Organization ID', 'error');
         return;
     }
-    
+
     if (typeof requestToJoinOrgWithId === 'function') {
         requestToJoinOrgWithId(orgId);
     } else {
@@ -4357,13 +4378,13 @@ async function submitInitialCreateRequest() {
         showToast('Please enter an Organization Name', 'error');
         return;
     }
-    
+
     if (typeof createOrganization === 'function') {
         const orgId = await createOrganization(orgName);
         if (orgId) {
             document.getElementById('createOrgUI').style.display = 'none';
             localStorage.setItem('pigmie_active_org', orgId);
-            
+
             // selectAppMode will show appUI and switch to org dashboard
             // after async Firestore data loads
             selectAppMode('org', orgId);
@@ -4672,3 +4693,31 @@ function toggleTheme() {
 }
 
 document.addEventListener('DOMContentLoaded', initTheme);
+
+// === Global Error Handlers ===
+// Catches uncaught errors and shows user-friendly messages instead of silent failures
+window.onerror = function(message, source, lineno, colno, error) {
+    console.error('Uncaught error:', { message, source, lineno, colno, error });
+    if (typeof showToast === 'function') {
+        showToast('Something went wrong. Please try again.', 'error');
+    }
+    return true; // Prevent default browser error dialog
+};
+
+window.addEventListener('unhandledrejection', function(event) {
+    console.error('Unhandled promise rejection:', event.reason);
+    if (typeof showToast === 'function') {
+        // Check for common Firebase errors
+        const msg = event.reason?.message || String(event.reason) || '';
+        if (msg.includes('permission-denied') || msg.includes('PERMISSION_DENIED')) {
+            showToast('Permission denied. You may not have access to this data.', 'error');
+        } else if (msg.includes('unavailable') || msg.includes('network')) {
+            showToast('Network error. Please check your internet connection.', 'error');
+        } else if (msg.includes('not-found')) {
+            showToast('The requested data was not found.', 'error');
+        } else {
+            showToast('Something went wrong. Please try again.', 'error');
+        }
+    }
+    event.preventDefault();
+});
