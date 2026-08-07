@@ -12,10 +12,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800&family=Noto+Sans+Kannada:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/png" href="icon-192.png">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="icon" type="image/png" href="/icon-192.png">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#4F46E5">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -26,6 +26,12 @@
         <div class="splash-logo">₹</div>
         <div class="splash-spinner"></div>
         <div class="splash-text" id="splashText">Loading...</div>
+    </div>
+
+    <!-- Loading Overlay (shown during network operations) -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">Please wait...</div>
     </div>
 
     <!-- Onboarding Gate (Shown Before Login) -->
@@ -1321,13 +1327,13 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-    <script src="firebase-config.js"></script>
-    <script src="sync.js?v=23"></script>
-    <script src="org.js?v=23"></script>
-    <script src="permissions.js?v=23"></script>
-    <script src="audit.js?v=23"></script>
-    <script src="customer-portal.js?v=23"></script>
-    <script src="app.js?v=23"></script>
+    <script src="/firebase-config.js"></script>
+    <script src="/sync.js?v=24"></script>
+    <script src="/org.js?v=24"></script>
+    <script src="/permissions.js?v=24"></script>
+    <script src="/audit.js?v=24"></script>
+    <script src="/customer-portal.js?v=24"></script>
+    <script src="/app.js?v=24"></script>
 </body>
 
 </html>
