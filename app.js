@@ -57,6 +57,9 @@ const TRANSLATIONS = {
         statTotalCollected: 'Total Collected',
         statPendingAmount: 'Pending Amount',
         statTodayCollection: "Today's Collection",
+        statTodayLoans: 'Loans:',
+        statTodaySavings: 'Savings:',
+        viewAll: 'View all',
 
         // Dashboard Cards
         collectionEfficiency: "Today's Collection Efficiency",
@@ -281,6 +284,7 @@ const TRANSLATIONS = {
         // Phase 4 - Areas, Bulk Entry, Reminders
         lblCustomerArea: 'Area / Route',
         allAreas: 'All Areas',
+        filterAllTypes: 'All Types',
         btnBatchCollect: 'Batch Collect',
         bulkCollectTitle: 'Batch Collect',
         lblBulkAmount: 'Amount per customer (₹)',
@@ -337,6 +341,9 @@ const TRANSLATIONS = {
         statTotalCollected: 'ಒಟ್ಟು ಸಂಗ್ರಹ',
         statPendingAmount: 'ಬಾಕಿ ಮೊತ್ತ',
         statTodayCollection: 'ಇಂದಿನ ಸಂಗ್ರಹ',
+        statTodayLoans: 'ಸಾಲ:',
+        statTodaySavings: 'ಉಳಿತಾಯ:',
+        viewAll: 'ಎಲ್ಲಾ ನೋಡಿ',
 
         // Dashboard Cards
         collectionEfficiency: 'ಇಂದಿನ ಸಂಗ್ರಹಣೆ ದಕ್ಷತೆ',
@@ -561,6 +568,7 @@ const TRANSLATIONS = {
         // Phase 4 - Areas, Bulk Entry, Reminders
         lblCustomerArea: 'ಪ್ರದೇಶ / ಮಾರ್ಗ',
         allAreas: 'ಎಲ್ಲಾ ಪ್ರದೇಶಗಳು',
+        filterAllTypes: 'ಎಲ್ಲಾ ವಿಧಗಳು',
         btnBatchCollect: 'ಒಟ್ಟಿಗೆ ಸಂಗ್ರಹಿಸಿ',
         bulkCollectTitle: 'ಒಟ್ಟಿಗೆ ಸಂಗ್ರಹಿಸಿ',
         lblBulkAmount: 'ಗ್ರಾಹಕರಿಗೆ ಮೊತ್ತ (₹)',
@@ -617,6 +625,9 @@ const TRANSLATIONS = {
         statTotalCollected: 'कुल संग्रह',
         statPendingAmount: 'बकाया राशि',
         statTodayCollection: 'आज का संग्रह',
+        statTodayLoans: 'ऋण:',
+        statTodaySavings: 'बचत:',
+        viewAll: 'सभी देखें',
 
         // Dashboard Cards
         collectionEfficiency: 'आज की संग्रह दक्षता',
@@ -841,6 +852,7 @@ const TRANSLATIONS = {
         // Phase 4 - Areas, Bulk Entry, Reminders
         lblCustomerArea: 'क्षेत्र / रूट',
         allAreas: 'सभी क्षेत्र',
+        filterAllTypes: 'सभी प्रकार',
         btnBatchCollect: 'बैच कलेक्ट',
         bulkCollectTitle: 'बैच कलेक्ट',
         lblBulkAmount: 'प्रति ग्राहक राशि (₹)',
@@ -2039,6 +2051,15 @@ function viewCustomerDetail(customerId) {
 
     title.textContent = t('customerRecord');
 
+    let portalUrl;
+    if (typeof appMode !== 'undefined' && appMode === 'org') {
+        const orgId = (typeof currentOrg !== 'undefined' && currentOrg) ? currentOrg.id : (localStorage.getItem('pigmie_active_org') || '');
+        portalUrl = window.location.origin + '?portal=1&org=' + orgId + '&cust=' + customerId;
+    } else {
+        portalUrl = 'Customer: ' + getDisplayName(customer) + ' | Phone: ' + customer.phone;
+    }
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(portalUrl)}`;
+
     body.innerHTML = `
         <div class="detail-header">
             ${getAvatarHtml(customer, 'detail-avatar')}
@@ -2164,6 +2185,11 @@ function viewCustomerDetail(customerId) {
                     `).join('')}
                 </tbody>
             </table>`}
+        </div>
+        <div class="qr-section" style="text-align: center; padding: 16px; border-top: 1px solid var(--border-color); margin-top: 16px;">
+            <h4 style="margin-bottom: 12px; color: var(--text-secondary);">📱 Customer QR Code</h4>
+            <img src="${qrUrl}" alt="QR Code" style="border-radius: 8px; background: white; padding: 8px;" width="180" height="180">
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Scan to view customer passbook</p>
         </div>`;
 
     modal.classList.add('active');

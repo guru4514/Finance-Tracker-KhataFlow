@@ -1,11 +1,65 @@
-# 🐷 Pigmie Record Management System (KhataFlow)
+<div align="center">
+  <h1>🐷 Pigmie (KhataFlow)</h1>
+  <p><em>A modern, high-performance micro-finance collection tracking system</em></p>
+  <p><strong>Offline-first • Multi-tenant • PWA + Android • Real-time Sync</strong></p>
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![License](https://img.shields.io/badge/license-ISC-green.svg)
-![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Android-orange.svg)
-![Stack](https://img.shields.io/badge/stack-Vanilla%20JS%20%7C%20Firebase%20%7C%20Capacitor-purple.svg)
+  ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+  ![License](https://img.shields.io/badge/license-ISC-green.svg)
+  ![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Android-orange.svg)
+  ![Stack](https://img.shields.io/badge/stack-Vanilla%20JS%20%7C%20Firebase%20%7C%20Capacitor-purple.svg)
+</div>
 
-**Pigmie** (Finance Tracker) is a modern, high-performance financial record and collection management solution tailored for finance agents, daily micro-finance collectors, and loan management organizations. Designed with an offline-first architecture, multi-tenant cloud sync, and native Android support, Pigmie streamlines daily collections, payment audits, and loan passbooks.
+
+---
+
+**Pigmie (KhataFlow)** is a modern, high-performance financial record and collection management solution tailored for finance agents, daily micro-finance collectors, and loan management organizations. Designed with an offline-first architecture, multi-tenant cloud sync, and native Android support, Pigmie streamlines daily collections, payment audits, and loan passbooks.
+
+---
+
+### 🎮 Demo
+
+Visit the live demo: [pigmie-web.pages.dev](https://pigmie-web.pages.dev)
+
+**Personal Mode:** No login required — start tracking immediately  
+**Organization Mode:** Sign in with Google to enable cloud sync  
+**Customer Portal:** Use Org ID + Customer ID + PIN to view passbook
+
+---
+
+### 📸 Screenshots
+
+| Personal Mode | Organization Mode | Customer Portal |
+|:---:|:---:|:---:|
+| ![Personal Mode](screenshots/personal-mode.png) | ![Org Mode](screenshots/org-mode.png) | ![Portal](screenshots/portal.png) |
+
+| Dashboard View | Daily Entry View | Dark Mode View | Android APK View |
+|:---:|:---:|:---:|:---:|
+| ![Dashboard](screenshots/dashboard.png) | ![Daily Entry](screenshots/daily-entry.png) | ![Dark Mode](screenshots/dark-mode.png) | ![Android APK](screenshots/android-apk.png) |
+
+---
+
+## ✨ What Makes This Special
+
+* **Offline-first architecture** with automatic cloud sync
+* **3 operating modes** (Personal, Organization, Customer Portal)
+* **Multi-language support** (English, Kannada, Hindi)
+* **Real-time collaborative data** with Firebase listeners
+* **RBAC** with 6 granular roles
+* **PWA + Native Android** from one codebase
+* **Dark mode + AMOLED true black** theme
+* **Financial analytics** with Chart.js
+* **Approval workflow** for ledger integrity
+* **CSV/PDF export capabilities**
+
+---
+
+## 🏗️ Architecture
+
+```text
+Browser (PWA) ──> IndexedDB (Offline) ──> Firebase Firestore (Cloud Sync)
+                                      ──> Firebase Auth (Google Sign-In)
+                                      ──> Capacitor ──> Android APK
+```
 
 ---
 
@@ -44,14 +98,14 @@ Native typography support for multi-regional deployment, including **Devanagari*
 
 ## 🛠️ Technology Stack
 
-| Category | Technology |
-| :--- | :--- |
-| **Frontend UI** | HTML5, CSS3 (Custom Variables & Modern Glassmorphism), Vanilla JavaScript (ES6+) |
-| **Local Storage** | IndexedDB (Browser Native API) |
-| **Cloud Backend** | Firebase Firestore (Realtime DB), Firebase Authentication |
-| **Mobile Runtime** | Capacitor Core v8, Capacitor Android |
-| **Native Plugins** | Native Biometric Auth, App, Filesystem, Share |
-| **Data Viz** | Chart.js |
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![Capacitor](https://img.shields.io/badge/Capacitor-119EFF?style=for-the-badge&logo=capacitor&logoColor=white)
+![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white)
+![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)
+![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 
 ---
 
@@ -60,6 +114,7 @@ Native typography support for multi-regional deployment, including **Devanagari*
 ```text
 Finance/
 ├── index.html                   # Core web application markup & onboarding screens
+├── app.html                     # App entry (mirrors index.html)
 ├── styles.css                   # Global styling system, dark mode, responsive layouts
 ├── app.js                       # Primary application state, IndexedDB engine & offline sync
 ├── sync.js                      # Firebase Auth state controller & mode switching logic
@@ -71,10 +126,21 @@ Finance/
 ├── firestore.rules              # Firebase Security Rules for database protection
 ├── manifest.json                # Web App Manifest for PWA installation
 ├── capacitor.config.json        # Native mobile build configuration
+├── landing/                     # Marketing website pages
+│   ├── index.html               # Landing page with hero, features overview
+│   ├── features.html            # Detailed features breakdown
+│   ├── pricing.html             # Pricing tiers
+│   ├── security.html            # Security & compliance info
+│   ├── portal.html              # Customer portal entry
+│   ├── contact.html             # Contact form
+│   ├── solo.html                # Solo agent landing
+│   └── teams.html               # Teams/org landing
 ├── scripts/
 │   ├── serve.js                 # Lightweight Node.js local development server
-│   └── sync-web.js              # Build script to copy web assets to dist directory (`www`)
-└── android/                     # Native Android project directory (Gradle project)
+│   ├── sync-web.js              # Build script to copy web assets to dist directory (www/)
+│   └── seed-demo-data.js        # Demo data seeder (paste in browser console)
+├── screenshots/                 # App screenshots for README & project report
+└── android/                     # Native Android project directory (Gradle)
 ```
 
 ---
@@ -158,7 +224,32 @@ Ensure your Firestore database rules are configured using `firestore.rules`. Key
 
 ---
 
+## 🔮 Future Scope / Production Roadmap
+
+> A production-grade architecture has been designed using React 18, NestJS, PostgreSQL with Row-Level Security, and Supabase for multi-tenant SaaS deployment. See the [Engineering Documentation Set](New%20folder/) for complete specifications.
+
+* **Migration to React + TypeScript frontend**
+* **NestJS REST API backend with Prisma ORM**
+* **PostgreSQL with Row-Level Security** for multi-tenant isolation
+* **TOTP-based Two-Factor Authentication**
+* **Automated CI/CD** with GitHub Actions
+* **Geo-tagged and photo-verified collections**
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+Feel free to check the [issues page](../../issues).
+
+---
+
+## 🧑‍💻 Author
+
+Built by a final year engineering student.
+
+---
+
 ## 📄 License
 
 This project is private software licensed under the **ISC License**.
-
